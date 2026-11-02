@@ -49,9 +49,7 @@ export const SEED = {
       ],
       cover_url: "",
       affiliate: [
-        { store: "Amazon", url: "https://www.amazon.in/s?k=The+48+Laws+of+Power+Robert+Greene" },
-        { store: "Flipkart", url: "https://www.flipkart.com/search?q=The+48+Laws+of+Power" },
-      ],
+        { store: "Amazon", url: "https://www.amazon.in/s?k=The+48+Laws+of+Power+Robert+Greene" },      ],
       pdf_url: "",
       featured: true,
       sort: 1,

@@ -1,5 +1,5 @@
 import { getSettings, getBook, listStories } from "./data.js";
-import { $, esc, inline, safeUrl, chrome, bookMock, lawTag, storyCard, endCard, disclosure, supportDialog, toast, setMeta } from "./ui.js";
+import { $, esc, inline, safeUrl, chrome, bookMock, lawTag, storyCard, endCard, supportDialog, toast, setMeta } from "./ui.js";
 
 const slug = new URLSearchParams(location.search).get("b") || "";
 const settings = await getSettings();
@@ -31,7 +31,7 @@ if (!book) {
             <p>এই বইটা বিনামূল্যে — PDF নামিয়ে নিন।</p>
             <button class="btn btn-maroon" id="getFree">⬇ বইটা নিন</button>
           </div>` : ""}
-        ${buy.length ? `<div class="buy-row">${buy.map((a) => `<a class="btn btn-gold" href="${safeUrl(a.url)}" target="_blank" rel="sponsored noopener">${esc(a.store)}-এ কিনুন ↗</a>`).join("")}</div>${disclosure()}` : ""}
+        ${buy.length ? `<div class="buy-row">${buy.map((a) => `<a class="btn btn-gold" href="${safeUrl(a.url)}" target="_blank" rel="sponsored noopener">${esc(a.store)}-এ কিনুন ↗</a>`).join("")}</div>` : ""}
       </div>
     </section>
 

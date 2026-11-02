@@ -1,5 +1,5 @@
 import { getSettings, listStories, listBooks } from "./data.js";
-import { $, inline, esc, safeUrl, chrome, storyCard, slideCard, bookCard, bookMock, endCard, disclosure, lawTag } from "./ui.js";
+import { $, inline, esc, safeUrl, chrome, storyCard, slideCard, bookCard, bookMock, endCard, lawTag } from "./ui.js";
 
 const settings = await getSettings();
 chrome(settings);
@@ -34,9 +34,7 @@ if (b) {
           <div class="buy-row">
             ${(b.affiliate || []).map((a) => `<a class="btn btn-gold" href="${safeUrl(a.url)}" target="_blank" rel="sponsored noopener">${esc(a.store)}-এ কিনুন ↗</a>`).join("")}
             <a class="btn btn-paper" href="${href}">বইটার গল্পগুলো</a>
-          </div>
-          ${(b.affiliate || []).length ? disclosure() : ""}
-        </div>
+          </div>        </div>
       </div>
     </div>`;
 }

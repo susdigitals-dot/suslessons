@@ -112,7 +112,6 @@ export function chrome(settings) {
       </div>
       <div class="wrap foot-small">
         <small>© ${bn(new Date().getFullYear())} sus.lessons · #sus_lessons</small>
-        <small>এই সাইটের কিছু বইয়ের লিংক affiliate লিংক — কিনলে আমরা সামান্য কমিশন পাই, আপনার দাম একই থাকে।</small>
       </div>`;
   }
 }
@@ -193,9 +192,6 @@ export function endCard(line, settings, sub = "এমন আরও গল্প�
       </div>
     </section>`;
 }
-
-export const disclosure = () =>
-  `<p class="disclosure">ⓘ এই লিংকগুলো affiliate লিংক — এখান থেকে কিনলে আমরা সামান্য কমিশন পাই, আপনার দাম একই থাকে।</p>`;
 
 // ── চা খাওয়ান (সাপোর্ট) ───────────────────────────
 export function supportDialog(settings, { title, download } = {}) {

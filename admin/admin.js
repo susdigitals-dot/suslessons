@@ -315,7 +315,7 @@ async function bookForm(b = {}) {
       <div class="repeat" id="laws" style="--cols:80px 1fr 1.3fr">${(b.laws || []).map(lawItem).join("")}</div>
       <button type="button" class="btn btn-ghost btn-sm add" id="addLaw">+ Law যোগ করো</button>
 
-      <div class="field"><span>কেনার লিংক (affiliate)</span><small>Amazon / Flipkart affiliate লিংক। প্রকাশের সময় disclosure লাইন নিজে থেকে দেখাবে।</small></div>
+      <div class="field"><span>কেনার লিংক (affiliate)</span><small>Amazon affiliate লিংক</small></div>
       <div class="repeat" id="aff" style="--cols:160px 1fr">${(b.affiliate || []).map(affItem).join("")}</div>
       <button type="button" class="btn btn-ghost btn-sm add" id="addAff">+ লিংক যোগ করো</button>
 
