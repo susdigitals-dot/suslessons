@@ -8,8 +8,8 @@
   ঘর দুটো ফাঁকা থাকলে সাইট seed.js-এর নমুনা লেখা দেখায়।
 */
 export const CONFIG = {
-  supabaseUrl: "",
-  supabaseAnonKey: "",
+  supabaseUrl: "https://lfvkfogsbdtrngjohlhl.supabase.co",
+  supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxmdmtmb2dzYmR0cm5nam9obGhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM2MjEzNTEsImV4cCI6MjEwOTE5NzM1MX0.o358ZkWgaQXNT-J5IH2awDOKjDjOnwMprGdBLzsSkAk",
 
   siteUrl: "https://suslessons.in",
   mediaBucket: "media",
