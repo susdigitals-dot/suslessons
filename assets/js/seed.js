@@ -205,22 +205,6 @@ export const SEED = {
       sort: 9,
       published: true,
     },
-    {
-      id: "b-free-notes",
-      slug: "48-laws-bangla-notes",
-      title: "48 Laws — Bangla Notes",
-      title_bn: "৪৮ নিয়মের বাংলা নোট",
-      author: "sus.lessons",
-      hook: "প্রতিটা নিয়ম, ==এক পাতায়।==",
-      description: "আমাদের নিজের লেখা ছোট্ট ই-বই — প্রতিটা নিয়ম সহজ বাংলায়, একটা করে ঘরোয়া উদাহরণ সহ। একদম বিনামূল্যে।",
-      laws: [],
-      cover_url: "",
-      affiliate: [],
-      pdf_url: "books/sample.pdf",
-      featured: false,
-      sort: 99,
-      published: true,
-    },
   ],
 
   stories: [
