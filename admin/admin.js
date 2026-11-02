@@ -158,7 +158,8 @@ async function dashboard(days = Number(sessionStorage.getItem("dash-days")) || 7
   $("#reload").onclick = () => go("dashboard");
 
   // লাইভ ভিজিটর — সাইটের প্রতিটা খোলা ট্যাব "live" চ্যানেলে presence পাঠায় (track.js)
-  liveCh = sb.channel("live");
+  // presence key না দিলে Supabase এই চ্যানেলে ভিজিটরের তালিকা পাঠায় না
+  liveCh = sb.channel("live", { config: { presence: { key: "admin-" + Math.random().toString(36).slice(2, 8) } } });
   liveCh.on("presence", { event: "sync" }, () => {
     const people = Object.values(liveCh.presenceState()).map((x) => x[0]).filter((x) => x?.path);
     const byPage = {};

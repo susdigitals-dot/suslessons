@@ -25,7 +25,10 @@ try {
   sid = Math.random().toString(36).slice(2, 14);
 }
 
-const path = location.pathname.replace(/\/index\.html$/, "/") + location.search;
+// fbclid / utm_* এর মতো ট্র্যাকিং প্যারামিটার বাদ দাও, নইলে একই পেজ আলাদা আলাদা দেখায়
+const qs = new URLSearchParams(location.search);
+[...qs.keys()].forEach((k) => /^(fbclid|gclid|igshid|mibextid|utm_.*)$/i.test(k) && qs.delete(k));
+const path = location.pathname.replace(/\/index\.html$/, "/") + (String(qs) ? "?" + qs : "");
 
 function send(ev) {
   // keepalive: পেজ ছেড়ে চলে গেলেও রিকোয়েস্টটা যায়
@@ -55,7 +58,10 @@ if (enabled) {
     (e) => {
       const a = e.target.closest?.("a[href]");
       if (!a) return;
-      const text = (a.textContent || a.getAttribute("aria-label") || "").replace(/\s+/g, " ").trim();
+      // কার্ডের পুরো লেখা না নিয়ে শুধু শিরোনামটা নাও
+      const title = a.querySelector(".bm-title, .slide-card-text, h1, h2, h3");
+      const text = (a.getAttribute("aria-label") || title?.textContent || a.querySelector("img[alt]")?.alt || a.textContent || "")
+        .replace(/\s+/g, " ").trim();
       const label = text || (a.hasAttribute("download") ? "⬇ ডাউনলোড" : a.href.split("/").pop());
       send({ kind: "click", label: label.slice(0, 200), href: a.href.slice(0, 600) });
     },
