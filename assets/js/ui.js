@@ -162,19 +162,25 @@ export function bookMock(b, size = "") {
     </div>`;
 }
 
-export function bookCard(b) {
-  const href = `book.html?b=${encodeURIComponent(b.slug)}`;
+// direct: বইয়ের পেজে না নিয়ে গিয়ে সোজা দোকানে (books.html-এ ব্যবহার হয়)
+export function bookCard(b, { direct = false } = {}) {
+  const buy = (b.affiliate || []).filter((a) => a.url);
+  const out = direct && buy.length;
+  const href = out ? safeUrl(buy[0].url) : `book.html?b=${encodeURIComponent(b.slug)}`;
+  const attrs = out ? ` target="_blank" rel="sponsored noopener"` : "";
   return `
     <article class="book-card">
-      <a href="${href}">${bookMock(b)}</a>
+      <a href="${href}"${attrs}>${bookMock(b)}</a>
       <div class="bc-body">
         <p class="bc-author">${esc(b.author)}</p>
-        <h3><a href="${href}">${esc(b.title)}</a></h3>
+        <h3><a href="${href}"${attrs}>${esc(b.title)}</a></h3>
         <p class="bc-bn">${esc(b.title_bn || "")}</p>
-        <div class="bc-actions">
+        ${out
+          ? `<div class="bc-buy">${buy.map((a) => `<a class="btn btn-gold" href="${safeUrl(a.url)}" target="_blank" rel="sponsored noopener">${esc(a.store)}-এ কিনুন ↗</a>`).join("")}</div>`
+          : `<div class="bc-actions">
           ${b.pdf_url ? `<span class="chip chip-free">বিনামূল্যে PDF</span>` : ""}
-          ${(b.affiliate || []).length ? `<span class="chip">কিনুন</span>` : ""}
-        </div>
+          ${buy.length ? `<span class="chip">কিনুন</span>` : ""}
+        </div>`}
       </div>
     </article>`;
 }

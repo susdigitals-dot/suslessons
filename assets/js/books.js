@@ -21,4 +21,4 @@ if (books.some((b) => b.pdf_url))
 if (show === "free") books = books.filter((b) => b.pdf_url);
 if (show === "buy") books = books.filter((b) => (b.affiliate || []).length);
 
-$("#shelf").innerHTML = books.length ? books.map(bookCard).join("") : `<p class="empty">এখানে এখনো কোনো বই নেই।</p>`;
+$("#shelf").innerHTML = books.length ? books.map((b) => bookCard(b, { direct: true })).join("") : `<p class="empty">এখানে এখনো কোনো বই নেই।</p>`;
