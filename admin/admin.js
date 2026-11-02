@@ -159,7 +159,7 @@ async function dashboard(days = Number(sessionStorage.getItem("dash-days")) || 7
 
   // লাইভ ভিজিটর — সাইটের প্রতিটা খোলা ট্যাব "live" চ্যানেলে presence পাঠায় (track.js)
   // presence key না দিলে Supabase এই চ্যানেলে ভিজিটরের তালিকা পাঠায় না
-  liveCh = sb.channel("live", { config: { presence: { key: "admin-" + Math.random().toString(36).slice(2, 8) } } });
+  liveCh = sb.channel("live", { config: { presence: { key: "admin-" + Math.random().toString(36).slice(2, 8), enabled: true } } });
   liveCh.on("presence", { event: "sync" }, () => {
     const people = Object.values(liveCh.presenceState()).map((x) => x[0]).filter((x) => x?.path);
     const byPage = {};
@@ -169,7 +169,10 @@ async function dashboard(days = Number(sessionStorage.getItem("dash-days")) || 7
     $("#livePages").innerHTML = Object.entries(byPage)
       .sort((a, b) => b[1] - a[1])
       .map(([p, n]) => `<li><span>${esc(pageName(p))}</span><b>${num(n)}</b></li>`).join("");
-  }).subscribe();
+  }).subscribe((s) => {
+    // নিজে একবার track না করলে Supabase অনেক সময় তালিকা পাঠায় না; path নেই বলে admin গোনা হয় না
+    if (s === "SUBSCRIBED") liveCh?.track({ admin: true });
+  });
 
   const [{ data: st, error }, { data: recent }] = await Promise.all([
     sb.rpc("event_stats", { p_days: days }),
