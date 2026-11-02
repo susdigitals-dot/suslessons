@@ -6,7 +6,8 @@ import { $, $$, esc, avatar, wordmark, toast } from "../assets/js/ui.js";
 
 const app = $("#app");
 let user = null;
-let view = "stories";
+let view = "dashboard";
+let liveCh = null;
 
 // সাইটের relative পাথ (assets/…) admin ফোল্ডার থেকে দেখাতে ../ লাগে
 const src = (u = "") => (!u || /^(https?:|data:|blob:)/.test(u) ? u : "../" + u);
@@ -101,6 +102,7 @@ function shell() {
     <div class="shell">
       <aside class="side">
         <div class="brand">${avatar(34)}${wordmark()}</div>
+        <button data-view="dashboard">📊 ড্যাশবোর্ড</button>
         <button data-view="stories">📝 গল্প</button>
         <button data-view="books">📚 বই</button>
         <button data-view="settings">⚙️ সেটিংস</button>
@@ -113,16 +115,96 @@ function shell() {
     </div>`;
   $$(".side [data-view]").forEach((b) => (b.onclick = () => go(b.dataset.view)));
   $("#logout").onclick = () => sb.auth.signOut();
+  // এই ব্রাউজার থেকে নিজের ভিজিট আর গোনা হবে না
+  try { localStorage.setItem("sus-notrack", "1"); } catch {}
   go(view);
 }
 
 function go(v) {
   view = v;
+  if (liveCh) sb.removeChannel(liveCh), (liveCh = null);
   $$(".side [data-view]").forEach((b) => b.setAttribute("aria-current", b.dataset.view === v));
-  ({ stories: storiesList, books: booksList, settings: settingsForm })[v]();
+  ({ dashboard, stories: storiesList, books: booksList, settings: settingsForm })[v]();
 }
 
 const main = () => $("#main");
+
+// ── ড্যাশবোর্ড: লাইভ ভিজিটর, ভিউ, লিংক ক্লিক ───────────────────────────
+const num = (n) => Number(n || 0).toLocaleString("bn-IN");
+const pageName = (p = "") => decodeURIComponent(p).replace(/^\//, "") || "হোম";
+
+async function dashboard(days = Number(sessionStorage.getItem("dash-days")) || 7) {
+  main().innerHTML = `
+    <div class="top">
+      <h1>ড্যাশবোর্ড</h1>
+      <div class="acts">
+        <select class="input" id="days" style="width:auto">
+          ${[[1, "আজ (২৪ ঘণ্টা)"], [7, "গত ৭ দিন"], [30, "গত ৩০ দিন"], [90, "গত ৯০ দিন"]]
+            .map(([d, l]) => `<option value="${d}"${d === days ? " selected" : ""}>${l}</option>`).join("")}
+        </select>
+        <button class="btn btn-ghost btn-sm" id="reload">↻ রিফ্রেশ</button>
+      </div>
+    </div>
+    <div class="live-card">
+      <span class="live-dot"></span>
+      <div><b id="liveNum">…</b> জন এখন সাইটে আছে</div>
+      <ul class="live-pages" id="livePages"></ul>
+    </div>
+    <div id="stats"><div class="skeleton"></div></div>`;
+  $("#days").onchange = (e) => {
+    sessionStorage.setItem("dash-days", e.target.value);
+    go("dashboard");
+  };
+  $("#reload").onclick = () => go("dashboard");
+
+  // লাইভ ভিজিটর — সাইটের প্রতিটা খোলা ট্যাব "live" চ্যানেলে presence পাঠায় (track.js)
+  liveCh = sb.channel("live");
+  liveCh.on("presence", { event: "sync" }, () => {
+    const people = Object.values(liveCh.presenceState()).map((x) => x[0]).filter((x) => x?.path);
+    const byPage = {};
+    people.forEach((x) => (byPage[x.path] = (byPage[x.path] || 0) + 1));
+    if (!$("#liveNum")) return;
+    $("#liveNum").textContent = num(people.length);
+    $("#livePages").innerHTML = Object.entries(byPage)
+      .sort((a, b) => b[1] - a[1])
+      .map(([p, n]) => `<li><span>${esc(pageName(p))}</span><b>${num(n)}</b></li>`).join("");
+  }).subscribe();
+
+  const [{ data: st, error }, { data: recent }] = await Promise.all([
+    sb.rpc("event_stats", { p_days: days }),
+    sb.from("events").select("label,href,path,created_at").eq("kind", "click").order("created_at", { ascending: false }).limit(25),
+  ]);
+  if (!$("#stats")) return;
+  if (error) {
+    $("#stats").innerHTML = `<div class="notice">ডেটা আনা গেল না (${esc(error.message)})।<br>
+      Supabase SQL Editor-এ আবার <code>supabase/schema.sql</code> Run করো — নতুন <code>events</code> টেবিলটা তৈরি হবে।</div>`;
+    return;
+  }
+  const max = Math.max(1, ...st.daily.map((d) => d.views));
+  const list = (rows, cell) =>
+    rows.length ? `<ol class="rank">${rows.map((r) => `<li>${cell(r)}<b>${num(r.n)}</b></li>`).join("")}</ol>` : `<p class="empty">এখনো কিছু নেই</p>`;
+  const when = (t) => new Date(t).toLocaleString("bn-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
+
+  $("#stats").innerHTML = `
+    <div class="kpis">
+      <div class="kpi"><span>পেজ ভিউ</span><b>${num(st.views)}</b></div>
+      <div class="kpi"><span>ভিজিটর</span><b>${num(st.visitors)}</b></div>
+      <div class="kpi"><span>লিংক ক্লিক</span><b>${num(st.clicks)}</b></div>
+    </div>
+    ${st.daily.length > 1 ? `<div class="panel"><h2>দিন অনুযায়ী ভিউ</h2><div class="bars">
+      ${st.daily.map((d) => `<div class="bar" title="${esc(d.d)} · ${d.views} ভিউ · ${d.clicks} ক্লিক"><i style="height:${(d.views / max) * 100}%"></i><small>${esc(d.d.slice(8))}</small></div>`).join("")}
+    </div></div>` : ""}
+    <div class="panel"><h2>কোন লিংকে কতজন ক্লিক করেছে</h2>
+      ${list(st.top_links, (r) => `<span><b>${esc(r.label || "—")}</b><a href="${esc(r.href)}" target="_blank" rel="noopener">${esc(r.href.replace(/^https?:\/\//, ""))}</a></span>`)}
+    </div>
+    <div class="grid2">
+      <div class="panel"><h2>সবচেয়ে বেশি দেখা পেজ</h2>${list(st.top_pages, (r) => `<span>${esc(pageName(r.path))}</span>`)}</div>
+      <div class="panel"><h2>কোথা থেকে এসেছে</h2>${list(st.top_refs, (r) => `<span>${esc(r.ref)}</span>`)}</div>
+    </div>
+    <div class="panel"><h2>সাম্প্রতিক ক্লিক</h2>
+      ${recent?.length ? `<ol class="rank recent">${recent.map((r) => `<li><span><b>${esc(r.label || "—")}</b><small>${esc(pageName(r.path))} থেকে</small></span><small>${when(r.created_at)}</small></li>`).join("")}</ol>` : `<p class="empty">এখনো কিছু নেই</p>`}
+    </div>`;
+}
 
 // ── গল্পের তালিকা ───────────────────────────
 async function storiesList() {

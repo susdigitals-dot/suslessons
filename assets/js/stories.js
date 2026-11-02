@@ -1,4 +1,5 @@
 import { getSettings, listStories } from "./data.js";
+import "./track.js";
 import { $, esc, chrome, storyCard, slideCard, setMeta } from "./ui.js";
 
 const params = new URLSearchParams(location.search);

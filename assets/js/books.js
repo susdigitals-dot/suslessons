@@ -1,4 +1,5 @@
 import { getSettings, listBooks } from "./data.js";
+import "./track.js";
 import { $, chrome, bookCard } from "./ui.js";
 
 const show = new URLSearchParams(location.search).get("show") || "";

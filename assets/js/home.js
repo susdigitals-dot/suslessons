@@ -1,4 +1,5 @@
 import { getSettings, listStories, listBooks } from "./data.js";
+import "./track.js";
 import { $, inline, esc, safeUrl, chrome, storyCard, slideCard, bookCard, bookMock, endCard, lawTag } from "./ui.js";
 
 const settings = await getSettings();

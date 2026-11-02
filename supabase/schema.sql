@@ -108,6 +108,58 @@ create policy "media admin update" on storage.objects for update using (bucket_i
 drop policy if exists "media admin delete" on storage.objects;
 create policy "media admin delete" on storage.objects for delete using (bucket_id = 'media' and public.is_admin());
 
+-- ── ভিজিট আর লিংক ক্লিক গোনা (admin → ড্যাশবোর্ড) ───────────────────────────
+-- যে কেউ লিখতে পারবে (সাইটের ভিজিটর), পড়তে পারবে শুধু admin। IP বা ব্যক্তিগত তথ্য রাখা হয় না।
+create table if not exists public.events (
+  id bigint generated always as identity primary key,
+  kind text not null check (kind in ('view', 'click')),
+  path text not null default '' check (length(path) <= 300),
+  label text not null default '' check (length(label) <= 200),
+  href text not null default '' check (length(href) <= 600),
+  ref text not null default '' check (length(ref) <= 300),
+  sid text not null default '' check (length(sid) <= 40),
+  created_at timestamptz not null default now()
+);
+create index if not exists events_time_idx on public.events (created_at desc);
+alter table public.events enable row level security;
+
+drop policy if exists "events anyone insert" on public.events;
+create policy "events anyone insert" on public.events for insert to anon, authenticated with check (true);
+drop policy if exists "events admin read" on public.events;
+create policy "events admin read" on public.events for select using (public.is_admin());
+drop policy if exists "events admin delete" on public.events;
+create policy "events admin delete" on public.events for delete using (public.is_admin());
+
+-- ড্যাশবোর্ডের হিসাব: গত p_days দিনের ভিউ, ভিজিটর, ক্লিক, সেরা লিংক/পেজ
+create or replace function public.event_stats(p_days int default 7)
+returns jsonb
+language sql stable security definer set search_path = public
+as $$
+  with e as (
+    select * from public.events
+    where public.is_admin() and created_at >= now() - make_interval(days => p_days)
+  )
+  select jsonb_build_object(
+    'views',    (select count(*) from e where kind = 'view'),
+    'visitors', (select count(distinct sid) from e where kind = 'view'),
+    'clicks',   (select count(*) from e where kind = 'click'),
+    'top_links', coalesce((select jsonb_agg(t) from (
+        select max(label) as label, href, count(*) as n from e where kind = 'click'
+        group by href order by n desc limit 25) t), '[]'),
+    'top_pages', coalesce((select jsonb_agg(t) from (
+        select path, count(*) as n from e where kind = 'view'
+        group by path order by n desc limit 15) t), '[]'),
+    'top_refs', coalesce((select jsonb_agg(t) from (
+        select ref, count(*) as n from e where kind = 'view' and ref <> ''
+        group by ref order by n desc limit 10) t), '[]'),
+    'daily', coalesce((select jsonb_agg(t order by t.d) from (
+        select (created_at at time zone 'Asia/Kolkata')::date as d,
+               count(*) filter (where kind = 'view') as views,
+               count(*) filter (where kind = 'click') as clicks
+        from e group by 1) t), '[]')
+  );
+$$;
+
 -- ── প্রথম অ্যাডমিন ───────────────────────────
 -- যে ইমেইল দিয়ে admin প্যানেলে লগইন করবে, সেটা এখানে দাও
 insert into public.admins (email) values ('maitys8289@gmail.com') on conflict do nothing;

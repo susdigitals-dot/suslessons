@@ -1,4 +1,5 @@
 import { getSettings, getStory, getBook, listStories } from "./data.js";
+import "./track.js";
 import { $, $$, bn, esc, inline, safeUrl, chrome, renderBody, fmtDate, lawTag, wordmark, avatar, endCard, bookMock, storyCard, setMeta } from "./ui.js";
 
 const slug = new URLSearchParams(location.search).get("s") || "";
