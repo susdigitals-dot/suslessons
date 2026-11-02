@@ -391,6 +391,7 @@ async function settingsForm() {
       <div class="grid2">
         <label class="field"><span>Instagram লিংক</span><input type="url" name="instagram" value="${esc(v.instagram)}"></label>
         <label class="field"><span>YouTube লিংক</span><input type="url" name="youtube" value="${esc(v.youtube)}"></label>
+        <label class="field"><span>Facebook লিংক</span><input type="url" name="facebook" value="${esc(v.facebook)}"></label>
         <label class="field"><span>ফলোয়ার সংখ্যা (হোমপেজে)</span><input type="text" name="followers" value="${esc(v.followers)}"></label>
       </div>
       <h2 style="font-size:1.4rem;margin-top:10px">☕ চা খাওয়ান (ফ্রি বই ডাউনলোডের সময়)</h2>
@@ -414,6 +415,7 @@ async function settingsForm() {
       intro: x.intro.trim(),
       instagram: x.instagram.trim(),
       youtube: x.youtube.trim(),
+      facebook: x.facebook.trim(),
       followers: x.followers.trim(),
       support: { enabled: !!x.s_enabled, title: x.s_title.trim(), text: x.s_text.trim(), upi: x.s_upi.trim(), upiName: x.s_upiName.trim(), bkash: x.s_bkash.trim(), link: x.s_link.trim() },
     };

@@ -19,7 +19,8 @@ export const SEED = {
     tagline: "গল্পের ==শেষ লাইনেই== আসল শিক্ষা",
     intro: "যে বইগুলো মানুষকে দেখার চোখ বদলে দেয়, সেগুলোর শিক্ষা — বাংলার ঘর, পাড়া আর লোকাল ট্রেনের ছোট ছোট গল্পে।",
     instagram: "https://instagram.com/sus.lessons",
-    youtube: "",
+    youtube: "https://www.youtube.com/channel/UCFbDGm8yw3Xj9ti0b6VIfaw",
+    facebook: "https://www.facebook.com/profile.php?id=61595912784513",
     followers: "৩০ হাজার+",
     support: {
       enabled: true,

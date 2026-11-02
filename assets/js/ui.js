@@ -107,6 +107,7 @@ export function chrome(settings) {
           ${NAV.map(([h, l]) => `<a href="${h}">${l}</a>`).join("")}
           <a href="${safeUrl(settings.instagram)}" target="_blank" rel="noopener">Instagram</a>
           ${settings.youtube ? `<a href="${safeUrl(settings.youtube)}" target="_blank" rel="noopener">YouTube</a>` : ""}
+          ${settings.facebook ? `<a href="${safeUrl(settings.facebook)}" target="_blank" rel="noopener">Facebook</a>` : ""}
         </nav>
       </div>
       <div class="wrap foot-small">
