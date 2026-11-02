@@ -1,0 +1,6 @@
+_old/
+*.log
+.DS_Store
+*.pdf
+!books/*.pdf
+.claude/

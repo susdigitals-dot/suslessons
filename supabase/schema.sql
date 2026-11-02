@@ -1,0 +1,116 @@
+-- sus.lessons — Supabase schema
+-- Supabase Dashboard → SQL Editor → New query → এই পুরো ফাইলটা পেস্ট করে Run।
+-- বারবার চালালেও সমস্যা নেই।
+
+-- ── অ্যাডমিন ───────────────────────────
+create table if not exists public.admins (
+  email text primary key
+);
+
+-- যার ইমেইল admins টেবিলে আছে, শুধু সে-ই লিখতে পারবে
+create or replace function public.is_admin()
+returns boolean
+language sql stable security definer set search_path = public
+as $$
+  select exists (select 1 from public.admins where lower(email) = lower(auth.jwt() ->> 'email'));
+$$;
+
+-- ── বই ───────────────────────────
+create table if not exists public.books (
+  id uuid primary key default gen_random_uuid(),
+  slug text unique not null,
+  title text not null,
+  title_bn text default '',
+  author text default '',
+  hook text default '',
+  description text default '',
+  laws jsonb not null default '[]',        -- [{no, name, line}]
+  cover_url text default '',
+  affiliate jsonb not null default '[]',   -- [{store, url}]
+  pdf_url text not null default '',
+  featured boolean not null default false,
+  sort int not null default 100,
+  published boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- ── গল্প (লেখা + স্লাইড) ───────────────────────────
+create table if not exists public.stories (
+  id uuid primary key default gen_random_uuid(),
+  slug text unique not null,
+  type text not null default 'blog' check (type in ('blog', 'slides')),
+  title text not null,
+  excerpt text default '',
+  last_line text default '',
+  cover_url text default '',
+  book_slug text references public.books(slug) on update cascade on delete set null,
+  law text default '',
+  tags text[] not null default '{}',
+  body text default '',
+  slides jsonb not null default '[]',      -- [{image, speaker, text}]
+  published boolean not null default false,
+  published_at date default current_date,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create index if not exists stories_pub_idx on public.stories (published, published_at desc);
+
+-- ── সাইট সেটিংস ───────────────────────────
+create table if not exists public.settings (
+  key text primary key,
+  value jsonb not null default '{}'
+);
+
+-- updated_at নিজে থেকে বদলাও
+create or replace function public.touch() returns trigger language plpgsql as $$
+begin new.updated_at = now(); return new; end $$;
+drop trigger if exists books_touch on public.books;
+create trigger books_touch before update on public.books for each row execute function public.touch();
+drop trigger if exists stories_touch on public.stories;
+create trigger stories_touch before update on public.stories for each row execute function public.touch();
+
+-- ── Row Level Security ───────────────────────────
+alter table public.admins enable row level security;
+alter table public.books enable row level security;
+alter table public.stories enable row level security;
+alter table public.settings enable row level security;
+
+drop policy if exists "admins read self" on public.admins;
+create policy "admins read self" on public.admins for select using (public.is_admin());
+
+drop policy if exists "books public read" on public.books;
+create policy "books public read" on public.books for select using (published or public.is_admin());
+drop policy if exists "books admin write" on public.books;
+create policy "books admin write" on public.books for all using (public.is_admin()) with check (public.is_admin());
+
+drop policy if exists "stories public read" on public.stories;
+create policy "stories public read" on public.stories for select using (published or public.is_admin());
+drop policy if exists "stories admin write" on public.stories;
+create policy "stories admin write" on public.stories for all using (public.is_admin()) with check (public.is_admin());
+
+drop policy if exists "settings public read" on public.settings;
+create policy "settings public read" on public.settings for select using (true);
+drop policy if exists "settings admin write" on public.settings;
+create policy "settings admin write" on public.settings for all using (public.is_admin()) with check (public.is_admin());
+
+-- ── ছবি / PDF রাখার জায়গা (Storage) ───────────────────────────
+insert into storage.buckets (id, name, public)
+values ('media', 'media', true)
+on conflict (id) do nothing;
+
+drop policy if exists "media public read" on storage.objects;
+create policy "media public read" on storage.objects for select using (bucket_id = 'media');
+drop policy if exists "media admin insert" on storage.objects;
+create policy "media admin insert" on storage.objects for insert with check (bucket_id = 'media' and public.is_admin());
+drop policy if exists "media admin update" on storage.objects;
+create policy "media admin update" on storage.objects for update using (bucket_id = 'media' and public.is_admin());
+drop policy if exists "media admin delete" on storage.objects;
+create policy "media admin delete" on storage.objects for delete using (bucket_id = 'media' and public.is_admin());
+
+-- ── প্রথম অ্যাডমিন ───────────────────────────
+-- যে ইমেইল দিয়ে admin প্যানেলে লগইন করবে, সেটা এখানে দাও
+insert into public.admins (email) values ('maitys8289@gmail.com') on conflict do nothing;
+
+-- ডিফল্ট সেটিংস (admin প্যানেল থেকে বদলানো যাবে)
+insert into public.settings (key, value) values ('site', '{}') on conflict do nothing;

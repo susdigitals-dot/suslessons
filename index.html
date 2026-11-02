@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>sus.lessons — গল্পের শেষ লাইনেই আসল শিক্ষা</title>
+  <meta name="description" content="যে বইগুলো মানুষকে দেখার চোখ বদলে দেয়, সেগুলোর শিক্ষা — বাংলার ঘর, পাড়া আর লোকাল ট্রেনের ছোট ছোট গল্পে।">
+  <meta property="og:title" content="sus.lessons — গল্পের শেষ লাইনেই আসল শিক্ষা">
+  <meta property="og:image" content="https://suslessons.in/assets/img/thumb-1.jpg">
+  <meta name="theme-color" content="#3E2228">
+  <link rel="icon" href="assets/brand/avatar.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Lora:ital,wght@0,500;0,600;1,500;1,600&family=Tiro+Bangla&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/site.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script type="module" src="assets/js/home.js"></script>
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div class="rise">
+          <span class="eyebrow">Bengali life-lesson stories</span>
+          <h1 id="heroTitle">গল্পের <mark>শেষ লাইনেই</mark><br>আসল শিক্ষা</h1>
+          <p class="lede" id="heroIntro"></p>
+          <div class="hero-actions">
+            <a class="btn btn-maroon" href="stories.html">গল্পগুলো পড়ুন →</a>
+            <a class="btn btn-ghost" href="books.html">বইয়ের তাক</a>
+          </div>
+          <div class="hero-stats">
+            <div><b id="statFollowers">৩০ হাজার+</b><span>Instagram পাঠক</span></div>
+            <div><b>১৪.২M</b><span>সবচেয়ে বেশি দেখা রিল</span></div>
+            <div><b>৪৮</b><span>নিয়ম, ৪৮টা গল্প</span></div>
+          </div>
+        </div>
+        <div class="hero-visual rise" style="animation-delay:.12s">
+          <span class="tag tag-now">আজ</span>
+          <div class="phone"><img src="assets/img/thumb-1.jpg" alt="sus.lessons রিলের একটা দৃশ্য — বাবা বলছেন, বেশি আদর দিলে ছেলে মাথায় চড়ে"></div>
+          <a class="phone-float" href="story.html?s=babar-bhalobashi">
+            <span class="eyebrow" style="margin:0 0 4px">5 Love Languages</span>
+            <p>বাবার “খেয়েছিস?”… <mark>ওটাই ওঁর ‘ভালোবাসি’।</mark></p>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">New stories</span>
+            <h2>নতুন গল্প</h2>
+            <p>একটা ছোট মুহূর্ত, একটা অজুহাত — আর শেষ লাইনে একটা শিক্ষা।</p>
+          </div>
+          <a class="section-link" href="stories.html">সব গল্প →</a>
+        </div>
+        <div class="story-grid" id="latest"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top:0">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Sliding stories</span>
+            <h2>স্লাইড গল্প</h2>
+            <p>আঙুল দিয়ে সরান — রিলের মতো, কিন্তু নিজের গতিতে।</p>
+          </div>
+          <a class="section-link" href="stories.html?type=slides">সব স্লাইড →</a>
+        </div>
+        <div class="rail" id="slidesRail"></div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top:0">
+      <div class="wrap" id="todayBook"></div>
+    </section>
+
+    <section class="section" style="padding-top:0">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">The bookshelf</span>
+            <h2>বইয়ের তাক</h2>
+            <p>যে বইগুলো থেকে আমাদের গল্প আসে — কিনুন, অথবা আমাদের ফ্রি নোট নামিয়ে নিন।</p>
+          </div>
+          <a class="section-link" href="books.html">সব বই →</a>
+        </div>
+        <div class="book-grid" id="shelf"></div>
+      </div>
+    </section>
+
+    <div class="wrap" id="endCard"></div>
+  </main>
+
+  <footer id="site-footer"></footer>
+</body>
+</html>
