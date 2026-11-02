@@ -26,7 +26,7 @@ if (!story) {
     ? `<a class="book-callout" href="book.html?b=${encodeURIComponent(book.slug)}">
         ${bookMock(book)}
         <div>
-          <span class="eyebrow">এই গল্পের বই${story.law ? " · LAW " + esc(String(story.law).padStart(2, "0")) : ""}</span>
+          <span class="eyebrow">From the book${story.law ? " · LAW " + esc(String(story.law).padStart(2, "0")) : ""}</span>
           <h3>${esc(book.title)}</h3>
           <p>${esc(book.author)} · ${esc(book.title_bn || "")}</p>
         </div>

@@ -17,12 +17,12 @@
   --line: rgba(62, 34, 40, 0.14);
 
   --display: "Tiro Bangla", serif;
-  --text: "Hind Siliguri", system-ui, sans-serif;
+  --text: "Anek Bangla", system-ui, sans-serif;
   --latin: "Lora", Georgia, serif;
 
   --r: 22px;
   --r-lg: 30px;
-  --shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset, 0 18px 40px -24px rgba(62, 34, 40, 0.45);
+  --shadow: 0 1px 2px rgba(62, 34, 40, 0.06);
   --wrap: 1180px;
   color-scheme: light;
 }
@@ -33,7 +33,7 @@ body {
   margin: 0;
   background: var(--cream);
   color: var(--ink);
-  font: 500 17px/1.7 var(--text);
+  font: 400 17px/1.75 var(--text);
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -96,11 +96,10 @@ p { margin: 0; }
   display: inline-flex; align-items: center; justify-content: center; gap: 10px;
   padding: 14px 24px; border-radius: 99px; border: 0; cursor: pointer;
   font: 700 1rem/1.2 var(--text); text-decoration: none; text-align: center;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s;
+  transition: background 0.15s, opacity 0.15s;
 }
-.btn:hover { transform: translateY(-2px); }
-.btn:active { transform: translateY(0); }
-.btn-maroon { background: var(--maroon); color: var(--paper); box-shadow: 0 10px 24px -14px var(--maroon); }
+.btn:active { opacity: 0.85; }
+.btn-maroon { background: var(--maroon); color: var(--paper); }
 .btn-maroon:hover { background: var(--maroon-2); }
 .btn-gold { background: var(--gold); color: var(--maroon); }
 .btn-ghost { background: transparent; color: var(--maroon); box-shadow: inset 0 0 0 1.5px var(--maroon); }
@@ -134,8 +133,8 @@ p { margin: 0; }
 }
 
 /* ── সেকশন ── */
-.section { padding: 72px 0; }
-.section-head { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
+.section { padding: clamp(40px, 7vw, 72px) 0; }
+.section-head { display: flex; align-items: end; justify-content: space-between; gap: 12px 20px; margin-bottom: clamp(18px, 3vw, 30px); flex-wrap: wrap; }
 .section-head h2 { font-size: clamp(1.8rem, 3.5vw, 2.6rem); }
 .section-head p { color: var(--muted); max-width: 52ch; margin-top: 6px; }
 .section-link { font-weight: 700; color: var(--maroon); text-decoration: none; border-bottom: 2px solid var(--gold); padding-bottom: 2px; white-space: nowrap; }
@@ -147,31 +146,18 @@ p { margin: 0; }
 .hero h1 { font-size: clamp(2.5rem, 6vw, 4.6rem); line-height: 1.22; }
 .hero .lede { font-size: 1.15rem; color: var(--muted); margin: 22px 0 30px; max-width: 46ch; }
 .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
-.hero-stats { display: flex; gap: 28px; margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--line); flex-wrap: wrap; }
-.hero-stats b { display: block; font: 400 1.7rem/1.1 var(--display); color: var(--maroon); }
-.hero-stats span { font-size: 0.9rem; color: var(--muted); }
 
 .phone {
-  position: relative; aspect-ratio: 9 / 16; width: min(340px, 100%); margin-inline: auto;
-  border-radius: 34px; overflow: hidden; background: var(--maroon);
-  box-shadow: 0 0 0 8px var(--paper), 0 0 0 9px var(--line), 0 40px 70px -30px rgba(62, 34, 40, 0.6);
-  transform: rotate(2deg);
+  position: relative; aspect-ratio: 9 / 16; width: min(300px, 100%); margin-inline: auto;
+  border-radius: 28px; overflow: hidden; background: var(--maroon);
+  border: 1px solid var(--line);
 }
 .phone img { width: 100%; height: 100%; object-fit: cover; }
-.phone-float {
-  position: absolute; left: -14%; top: 52%; width: 62%; text-decoration: none;
-  background: var(--paper); border-radius: var(--r); padding: 14px 18px 16px;
-  box-shadow: var(--shadow); transform: rotate(-3deg);
-}
-.phone-float .speaker { margin-bottom: 4px; }
-.phone-float p { font: 400 1.15rem/1.4 var(--display); }
-.hero-visual { position: relative; padding: 10px 0 10px 40px; }
-.hero-visual .tag { position: absolute; top: 6%; right: 0; transform: rotate(4deg); background: var(--paper); }
+.hero-visual { display: block; }
 
 @media (max-width: 900px) {
-  .hero-grid { grid-template-columns: 1fr; gap: 40px; }
-  .hero-visual { padding: 0 0 0 30px; max-width: 380px; margin-inline: auto; }
-  .phone-float { left: -10%; }
+  .hero-grid { grid-template-columns: 1fr; gap: 0; }
+  .hero-visual { display: none; }
 }
 
 /* ── কথোপকথনের বাক্স (caption box) ── */
@@ -182,15 +168,14 @@ p { margin: 0; }
 
 /* ── গল্পের কার্ড ── */
 .story-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 26px; }
-.story-card { background: var(--paper); border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow); display: flex; flex-direction: column; transition: transform 0.2s ease; }
-.story-card:hover { transform: translateY(-4px); }
-.sc-media { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: var(--light); display: block; }
+.story-card { display: flex; flex-direction: column; }
+.sc-media { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: var(--light); display: block; border-radius: var(--r); }
 .sc-media img { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; transition: transform 0.5s ease; }
 .story-card:hover .sc-media img { transform: scale(1.035); }
 .sc-blank { display: grid; place-items: center; height: 100%; background: var(--maroon); }
 .sc-blank .wordmark { color: var(--gold); }
 .sc-kind { position: absolute; top: 14px; left: 14px; background: var(--maroon); color: var(--paper); font: 700 0.78rem/1 var(--text); padding: 7px 11px; border-radius: 99px; }
-.sc-body { padding: 20px 22px 24px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.sc-body { padding: 14px 2px 0; display: flex; flex-direction: column; gap: 8px; flex: 1; }
 .sc-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .sc-body h3 { font-size: 1.4rem; }
 .sc-body h3 a { text-decoration: none; }
@@ -199,7 +184,7 @@ p { margin: 0; }
 
 /* ── স্লাইড গল্পের রেল ── */
 .rail { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(220px, 260px); gap: 18px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 16px 18px; margin: 0 -16px; scrollbar-width: thin; }
-.slide-card { scroll-snap-align: start; position: relative; aspect-ratio: 9 / 16; border-radius: 26px; overflow: hidden; background: var(--maroon); text-decoration: none; color: var(--paper); box-shadow: var(--shadow); display: block; }
+.slide-card { scroll-snap-align: start; position: relative; aspect-ratio: 9 / 16; border-radius: var(--r); overflow: hidden; background: var(--maroon); text-decoration: none; color: var(--paper); display: block; }
 .slide-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
 .slide-card:hover img { transform: scale(1.04); }
 .slide-card::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, rgba(42, 20, 24, 0.92)); }
@@ -210,10 +195,9 @@ p { margin: 0; }
 .slide-card-count { position: absolute; left: 16px; bottom: 16px; z-index: 1; font: 700 0.8rem/1 var(--text); color: var(--gold); }
 
 /* ── মেরুন বই মক ── */
-.book-mock { aspect-ratio: 2 / 3; border-radius: 6px 14px 14px 6px; background: linear-gradient(100deg, #2f181d 0 5%, var(--maroon) 7% 100%); padding: 10px; position: relative; box-shadow: inset 5px 0 0 rgba(0, 0, 0, 0.18), 0 22px 36px -20px rgba(42, 20, 24, 0.8); transition: transform 0.25s; }
+.book-mock { aspect-ratio: 2 / 3; border-radius: 6px 14px 14px 6px; background: linear-gradient(100deg, #2f181d 0 5%, var(--maroon) 7% 100%); padding: 10px; position: relative; box-shadow: inset 5px 0 0 rgba(0, 0, 0, 0.18); }
 .book-mock.has-img { padding: 0; overflow: hidden; background: var(--maroon); }
 .book-mock.has-img img { width: 100%; height: 100%; object-fit: cover; }
-a:hover > .book-mock { transform: translateY(-4px) rotate(-1deg); }
 .bm-frame { height: 100%; border: 1.5px solid var(--gold); border-radius: 4px 10px 10px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 14px 12px; text-align: center; }
 .bm-mark { font: italic 600 0.62rem/1 var(--latin); color: var(--gold); position: absolute; top: 22px; }
 .bm-title { font: 600 1.25rem/1.15 var(--latin); color: var(--paper); }
@@ -234,8 +218,7 @@ a:hover > .book-mock { transform: translateY(-4px) rotate(-1deg); }
 .bc-actions { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
 
 /* ── আজকের বই (মেরুন) ── */
-.today { background: var(--maroon); color: var(--paper); border-radius: 36px; padding: clamp(28px, 5vw, 60px); position: relative; overflow: hidden; }
-.today::before { content: ""; position: absolute; inset: 14px; border: 1px solid rgba(214, 163, 92, 0.45); border-radius: 26px; pointer-events: none; }
+.today { background: var(--maroon); color: var(--paper); border-radius: var(--r-lg); padding: clamp(24px, 5vw, 56px); }
 .today-grid > a, .book-callout, .book-hero a { text-decoration: none; }
 .today-grid { display: grid; grid-template-columns: 260px 1fr; gap: clamp(28px, 5vw, 64px); align-items: center; position: relative; }
 .today .eyebrow { color: var(--gold); }
@@ -250,12 +233,15 @@ a:hover > .book-mock { transform: translateY(-4px) rotate(-1deg); }
 .buy-row { display: flex; gap: 10px; flex-wrap: wrap; }
 @media (max-width: 760px) {
   .today-grid { grid-template-columns: 1fr; }
-  .today-grid .book-mock { max-width: 220px; margin-inline: auto; }
+  .today-grid .book-mock { max-width: 150px; margin-inline: auto; }
+  .today-grid .book-mock .bm-title { font-size: 1.15rem; }
+  .today-grid .book-mock .bm-bn { font-size: 0.85rem; }
+  .today-grid .book-mock .bm-mark, .today-grid .book-mock .bm-author { display: none; }
 }
 
 /* ── এন্ড কার্ড ── */
-.end-card { background: var(--maroon); border-radius: 36px; padding: 14px; margin: 72px 0; }
-.end-frame { border: 1.5px solid var(--gold); border-radius: 26px; padding: clamp(36px, 6vw, 70px) 24px; text-align: center; display: flex; flex-direction: column; align-items: center; }
+.end-card { background: var(--maroon); border-radius: var(--r-lg); padding: 10px; margin: clamp(40px, 7vw, 72px) 0; }
+.end-frame { border: 1px solid rgba(214, 163, 92, 0.6); border-radius: 22px; padding: clamp(36px, 6vw, 70px) 24px; text-align: center; display: flex; flex-direction: column; align-items: center; }
 .end-frame .wordmark { color: var(--light); font-size: 1rem; }
 .end-line { font: 400 clamp(1.7rem, 4vw, 2.6rem)/1.4 var(--display); color: var(--paper); margin-top: 26px; max-width: 22ch; }
 .end-line mark { color: var(--thumb-gold); }
@@ -371,6 +357,51 @@ a:hover > .book-mock { transform: translateY(-4px) rotate(-1deg); }
 .foot-nav a { text-decoration: none; font-weight: 600; color: var(--muted); }
 .foot-nav a:hover { color: var(--maroon); }
 .foot-small { display: flex; justify-content: space-between; gap: 10px 30px; flex-wrap: wrap; margin-top: 30px; color: var(--muted); font-size: 0.82rem; }
+
+/* ── মোবাইল ── */
+@media (max-width: 600px) {
+  body { font-size: 16px; }
+  .bar { height: 60px; }
+  .nav { top: 60px; }
+  #site-header .avatar { --s: 34px; }
+  .hero { padding: 36px 0 12px; }
+  .hero h1 { font-size: 2.35rem; }
+  .hero .lede { font-size: 1.02rem; margin: 14px 0 22px; }
+  .hero-actions .btn { flex: 1; padding: 13px 16px; }
+  .section-head h2 { font-size: 1.65rem; }
+  .section-head p { display: none; }
+  .story-grid { gap: 30px; }
+  .sc-media { aspect-ratio: 16 / 10; }
+  .sc-body h3 { font-size: 1.25rem; }
+  .rail { grid-auto-columns: 62vw; gap: 12px; }
+  .book-grid { grid-template-columns: repeat(2, 1fr); gap: 22px 14px; }
+  .bm-title { font-size: 1rem; }
+  .bm-bn { font-size: 0.8rem; }
+  .bm-mark, .bm-author { display: none; }
+  .bc-body { padding-top: 10px; }
+  .bc-body h3 { font-size: 1rem; }
+  .bc-author { font-size: 0.8rem; }
+  .today .lede { margin: 10px 0 18px; }
+  .laws li { grid-template-columns: 1fr; padding: 12px 14px; gap: 6px; }
+  .laws .law { grid-row: auto; justify-self: start; }
+  .buy-row .btn { flex: 1; }
+  .page-head { padding: 32px 0 6px; }
+  .page-head p { font-size: 1rem; }
+  .filters { flex-wrap: nowrap; overflow-x: auto; margin: 0 -16px 22px; padding: 0 16px; scrollbar-width: none; }
+  .filters a { white-space: nowrap; }
+  .read-head { padding: 30px 0 16px; }
+  .read-cover { border-radius: var(--r); }
+  .prose { margin-top: 28px; font-size: 1.05rem; line-height: 1.85; }
+  .caption-box { padding: 16px 18px 18px; border-radius: var(--r); }
+  .statement { padding: 26px 20px; border-radius: var(--r); }
+  .book-callout { grid-template-columns: 70px 1fr; gap: 14px; padding: 14px; border-radius: var(--r); }
+  .book-hero { padding-top: 28px; gap: 24px; }
+  .book-hero > .book-mock { max-width: 170px; }
+  .book-hero .hook { font-size: 1.3rem; margin-top: 16px; }
+  .end-line { font-size: 1.55rem; }
+  .foot { gap: 18px; }
+  .foot-nav { gap: 4px 16px; }
+}
 
 /* ── লোডিং / খালি ── */
 .skeleton { background: linear-gradient(90deg, var(--light), var(--paper), var(--light)); background-size: 200% 100%; animation: sk 1.4s infinite; border-radius: var(--r-lg); min-height: 280px; }

@@ -6,8 +6,6 @@ chrome(settings);
 
 $("#heroTitle").innerHTML = inline(settings.tagline).replace(/(শেষ লাইনেই<\/mark>)\s*/, "$1<br>");
 $("#heroIntro").textContent = settings.intro;
-$("#statFollowers").textContent = settings.followers;
-
 const [blogs, slides, books] = await Promise.all([
   listStories({ type: "blog", limit: 6 }),
   listStories({ type: "slides", limit: 10 }),
@@ -27,7 +25,7 @@ if (b) {
       <div class="today-grid">
         <a href="${href}">${bookMock(b, "lg")}</a>
         <div>
-          <span class="eyebrow">আজকের বই · ${esc(b.author)}</span>
+          <span class="eyebrow">Book of the day · ${esc(b.author)}</span>
           <h2>${inline(b.hook || b.title_bn)}</h2>
           <p class="lede">${inline(b.description)}</p>
           ${(b.laws || []).length ? `<ul class="laws">${b.laws.slice(0, 3).map((l) => `<li>${lawTag(l.no)}<b>${esc(l.name)}</b><span>${esc(l.line)}</span></li>`).join("")}</ul>` : ""}
