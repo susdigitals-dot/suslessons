@@ -68,7 +68,7 @@ const NAV = [
   ["index.html", "হোম"],
   ["stories.html", "গল্প"],
   ["books.html", "বই"],
-  ["shop.html", "দোকান"],
+  ["/shop", "দোকান"],
 ];
 
 // ফুটারের আইনি পাতা — পেমেন্ট গেটওয়ে (Razorpay ইত্যাদি) এগুলো চায়
@@ -85,7 +85,9 @@ export function chrome(settings) {
   document.addEventListener("click", (e) => {
     if (e.target.closest("[data-follow]")) followDialog(settings);
   });
-  const here = location.pathname.split("/").pop() || "index.html";
+  // "/shop", "shop.html" আর "/shop.html" — সবই একই পাতা
+  const page = (h) => h.split("/").pop().replace(/\.html$/, "") || "index";
+  const here = page(location.pathname);
   const header = $("#site-header");
   if (header) {
     header.innerHTML = `
@@ -93,7 +95,7 @@ export function chrome(settings) {
         <a class="brand" href="index.html" aria-label="sus.lessons হোম">${avatar(40)}${wordmark()}</a>
         <button class="menu-btn" aria-label="মেনু" aria-expanded="false"><span></span><span></span></button>
         <nav class="nav">
-          ${NAV.map(([href, label]) => `<a href="${href}"${href === here ? ' aria-current="page"' : ""}>${label}</a>`).join("")}
+          ${NAV.map(([href, label]) => `<a href="${href}"${page(href) === here ? ' aria-current="page"' : ""}>${label}</a>`).join("")}
           <button class="pill pill-maroon nav-follow" type="button" data-follow>ফলো করুন</button>
         </nav>
       </div>`;

@@ -1,6 +1,6 @@
-import { getSettings, getProduct } from "./data.js?v=202611031510";
-import "./track.js?v=202611031510";
-import { $, esc, bn, inline, safeUrl, chrome, productMock, priceTag, KINDS, endCard, setMeta } from "./ui.js?v=202611031510";
+import { getSettings, getProduct } from "./data.js?v=202611031512";
+import "./track.js?v=202611031512";
+import { $, esc, bn, inline, safeUrl, chrome, productMock, priceTag, KINDS, endCard, setMeta } from "./ui.js?v=202611031512";
 
 const slug = new URLSearchParams(location.search).get("p") || "";
 const settings = await getSettings();
@@ -11,7 +11,7 @@ const main = $("#product");
 const biz = settings.business || {};
 
 if (!p) {
-  main.innerHTML = `<div class="empty"><h2>জিনিসটা খুঁজে পেলাম না</h2><p><a class="section-link" href="shop.html">দোকানে ফিরুন →</a></p></div>`;
+  main.innerHTML = `<div class="empty"><h2>জিনিসটা খুঁজে পেলাম না</h2><p><a class="section-link" href="/shop">দোকানে ফিরুন →</a></p></div>`;
 } else {
   setMeta(p.title, p.subtitle || p.description);
   const aff = p.kind === "affiliate";
@@ -43,6 +43,6 @@ if (!p) {
         ${(p.includes || []).length ? `<h2 class="prod-h">ভেতরে যা আছে</h2><ul class="includes">${p.includes.map((x) => `<li>${inline(x)}</li>`).join("")}</ul>` : ""}
       </div>
     </section>
-    <p class="shop-note"><a href="shop.html">← দোকানে ফিরুন</a> · <a href="contact.html">প্রশ্ন আছে? যোগাযোগ করুন</a></p>
+    <p class="shop-note"><a href="/shop">← দোকানে ফিরুন</a> · <a href="contact.html">প্রশ্ন আছে? যোগাযোগ করুন</a></p>
     ${endCard("বই পড়ুন, শিখুন — ==শেষ লাইনটা মনে রাখুন।==", settings)}`;
 }
