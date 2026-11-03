@@ -221,8 +221,10 @@ create table if not exists public.donations (
   email text not null default '',
   contact text not null default '',
   purpose text not null default '',        -- cha
+  items text not null default '',          -- ২টা ভাঁড়ের চা · ১টা সন পাপড়ি
   created_at timestamptz not null default now()
 );
+alter table public.donations add column if not exists items text not null default '';
 create index if not exists donations_time_idx on public.donations (created_at desc);
 alter table public.donations enable row level security;
 drop policy if exists "donations admin all" on public.donations;

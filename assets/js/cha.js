@@ -1,4 +1,5 @@
 // চা খাওয়ান — শুধু ভারতের পাঠকদের জন্য (Razorpay পপআপ, order আসে supabase/functions/cha-order থেকে)। বাংলাদেশ বা অন্য দেশ থেকে এলে পাতাটা চা দেখায় না।
+// চায়ের দোকানের মেনু: প্রতিটা জিনিসের দাম বাঁধা, শুধু সংখ্যা বাড়ানো-কমানো যায়, একসাথে কয়েকটা নেওয়া যায়
 import { CONFIG } from "./config.js";
 import { getSettings } from "./data.js";
 import "./track.js";
@@ -10,12 +11,12 @@ chrome(settings);
 const sp = settings.support || {};
 const main = $("#cha");
 
-// কাপ ভরাট: ০ – ১ (কত টাকায় কতটা চা)
-const CUPS = [
-  { amt: 20, name: "ভাঁড়ের চা", sub: "স্টেশনের ধারে, এক চুমুকে শেষ", fill: 0.45 },
-  { amt: 50, name: "চা আর বিস্কুট", sub: "পরের গল্পটা লেখার সময় সঙ্গী", fill: 0.7, pick: true },
-  { amt: 100, name: "আড্ডার চা", sub: "দু'কাপ চা, একটা লম্বা গল্প", fill: 0.95 },
+const MENU = [
+  { id: "cha", name: "ভাঁড়ের চা", price: 5, img: "assets/img/cha/cha.webp", sub: "মাটির ভাঁড়ে, গরম গরম" },
+  { id: "bapuji", name: "বাপুজি কেক", price: 8, img: "assets/img/cha/bapuji.webp", sub: "চায়ের সাথে সেই পুরোনো সঙ্গী" },
+  { id: "soan", name: "সন পাপড়ি", price: 5, img: "assets/img/cha/soan-papdi.webp", sub: "মুখে দিলেই গলে যায়", fav: true },
 ];
+const MAX = 20; // একটা জিনিস সর্বোচ্চ কতগুলো
 
 if (!isIndia()) {
   main.innerHTML = `
@@ -33,72 +34,74 @@ if (!isIndia()) {
 }
 
 function render() {
+  const qty = { cha: 1, bapuji: 0, soan: 0 };
+
   main.innerHTML = `
     <section class="cha">
-      <div class="cha-art" aria-hidden="true">
-        <div class="cha-steam"><i></i><i></i><i></i></div>
-        <svg viewBox="0 0 200 180" class="cha-cup">
-          <defs><clipPath id="cupIn"><path d="M38 52 h112 l-12 96 a14 14 0 0 1 -14 12 h-60 a14 14 0 0 1 -14 -12 z"/></clipPath></defs>
-          <path d="M150 74 h10 a22 22 0 0 1 0 44 h-16" fill="none" stroke="#3e2228" stroke-width="9" stroke-linecap="round"/>
-          <path d="M38 52 h112 l-12 96 a14 14 0 0 1 -14 12 h-60 a14 14 0 0 1 -14 -12 z" fill="#c9764a"/>
-          <rect class="cha-tea" x="30" y="52" width="130" height="120" fill="#7a3f1f" clip-path="url(#cupIn)"/>
-          <path d="M38 52 h112 l-12 96 a14 14 0 0 1 -14 12 h-60 a14 14 0 0 1 -14 -12 z" fill="none" stroke="#3e2228" stroke-width="5"/>
-          <path d="M56 98 q38 14 76 0" fill="none" stroke="#d6a35c" stroke-width="3" opacity=".7"/>
-          <ellipse cx="94" cy="166" rx="70" ry="7" fill="#3e2228" opacity=".12"/>
-        </svg>
-      </div>
-      <div class="cha-body">
+      <div class="cha-head">
         <span class="eyebrow">চায়ের দোকান</span>
         <h1>${esc(sp.title || "দাদাকে এক কাপ চা খাওয়ান")}</h1>
-        <p class="cha-lead">${inline("বই আর গল্প ==সবার জন্য ফ্রি।== ভালো লাগলে এক কাপ চা খাওয়াতে পারেন — পরের গল্পটা হয়তো একটু তাড়াতাড়ি আসবে।")}</p>
-        <div class="cha-cups" role="radiogroup" aria-label="কোন চা">
-          ${CUPS.map((c) => `
-            <button type="button" class="cha-opt" role="radio" aria-checked="${!!c.pick}" data-amt="${c.amt}" data-fill="${c.fill}">
-              <b>₹${bn(c.amt)}</b><span>${c.name}</span><small>${c.sub}</small>
-            </button>`).join("")}
-        </div>
-        <form class="cha-own" id="ownForm"><span>নিজের মতো</span><span class="cha-rs">₹</span><input type="number" inputmode="numeric" min="1" max="10000" placeholder="যত খুশি" id="own" aria-label="নিজের মতো টাকা"><button class="btn-mini" type="submit" id="ownGo">খাওয়ান</button></form>
-        <div class="cha-pay" id="pay" aria-live="polite"></div>
-        <p class="cha-note">চা খাওয়ানো পুরোপুরি আপনার ইচ্ছে — না খাওয়ালেও বই, গল্প সব একই থাকবে। ❤️<br>এটা দান, কোনো কেনাকাটা নয়; তাই রিফান্ড হয় না।</p>
+        <p class="cha-lead">${inline("বই আর গল্প ==সবার জন্য ফ্রি।== ভালো লাগলে দোকান থেকে কিছু একটা খাওয়ান — পরের গল্পটা হয়তো একটু তাড়াতাড়ি আসবে।")}</p>
       </div>
+      <div class="cha-menu">
+        ${MENU.map((m) => `
+          <article class="cha-item" data-id="${m.id}">
+            <div class="cha-pic">
+              <img src="${m.img}" alt="${esc(m.name)}" width="480" height="480" loading="lazy">
+              ${m.fav ? `<span class="cha-fav">❤ দাদার প্রিয়</span>` : ""}
+            </div>
+            <div class="cha-info">
+              <h2>${esc(m.name)}</h2>
+              <p>${esc(m.sub)}</p>
+              <div class="cha-row">
+                <b class="cha-price">₹${bn(m.price)}</b>
+                <div class="cha-step" role="group" aria-label="${esc(m.name)} কতগুলো">
+                  <button type="button" data-step="-1" aria-label="একটা কমান">−</button>
+                  <output aria-live="polite">${bn(qty[m.id])}</output>
+                  <button type="button" data-step="1" aria-label="একটা বাড়ান">+</button>
+                </div>
+              </div>
+            </div>
+          </article>`).join("")}
+      </div>
+      <div class="cha-bar">
+        <div class="cha-sum"><small id="sumItems"></small><b id="sumTotal"></b></div>
+        <button class="btn btn-maroon" type="button" id="payGo">খাওয়ান ☕</button>
+      </div>
+      <div class="cha-pay" id="pay" aria-live="polite"></div>
+      <p class="cha-note">খাওয়ানো পুরোপুরি আপনার ইচ্ছে — না খাওয়ালেও বই, গল্প সব একই থাকবে। ❤️<br>এটা দান, কোনো কেনাকাটা নয়; তাই রিফান্ড হয় না।</p>
     </section>`;
 
   const pay = $("#pay");
-  const own = $("#own");
-  const opts = [...main.querySelectorAll(".cha-opt")];
-  const fillCup = (f) => main.style.setProperty("--fill", f);
-  const pick = (o) => opts.forEach((x) => x.setAttribute("aria-checked", x === o));
+  const total = () => MENU.reduce((n, m) => n + m.price * qty[m.id], 0);
+  // "২টা ভাঁড়ের চা · ১টা সন পাপড়ি"
+  const summary = () => MENU.filter((m) => qty[m.id]).map((m) => `${bn(qty[m.id])}টা ${m.name}`).join(" · ");
 
-  // কাপে চাপ দিলেই সেই টাকার পেমেন্ট পপআপ
+  function draw() {
+    MENU.forEach((m) => {
+      const el = main.querySelector(`.cha-item[data-id="${m.id}"]`);
+      el.classList.toggle("on", qty[m.id] > 0);
+      el.querySelector("output").textContent = bn(qty[m.id]);
+      el.querySelector('[data-step="-1"]').disabled = !qty[m.id];
+      el.querySelector('[data-step="1"]').disabled = qty[m.id] >= MAX;
+    });
+    const t = total();
+    $("#sumItems").textContent = summary() || "কিছু বাছুন";
+    $("#sumTotal").textContent = `মোট ₹${bn(t)}`;
+    $("#payGo").disabled = !t;
+  }
+
   main.addEventListener("click", (e) => {
-    const o = e.target.closest(".cha-opt");
-    if (!o) return;
-    pick(o);
-    own.value = "";
-    fillCup(o.dataset.fill);
-    checkout(Number(o.dataset.amt));
-  });
-
-  own.addEventListener("input", () => {
-    const n = Math.round(Number(own.value) || 0);
-    if (n > 0) {
-      pick(null);
-      fillCup(Math.min(1, 0.3 + n / 150));
+    const b = e.target.closest("[data-step]");
+    if (b) {
+      const id = b.closest(".cha-item").dataset.id;
+      qty[id] = Math.min(MAX, Math.max(0, qty[id] + Number(b.dataset.step)));
+      draw();
     }
+    if (e.target.closest("#payGo")) checkout();
   });
 
-  $("#ownForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const n = Math.round(Number(own.value) || 0);
-    if (n < 1 || n > 10000) {
-      toast("₹১ থেকে ₹১০,০০০-এর মধ্যে লিখুন");
-      own.focus();
-      return;
-    }
-    checkout(n);
-  });
-
-  fillCup(CUPS.find((c) => c.pick).fill);
+  draw();
 
   // Supabase-এর cha-order function থেকে Razorpay order — না পেলে order ছাড়াই পপআপ খোলে
   async function makeOrder(amt) {
@@ -116,7 +119,9 @@ function render() {
   }
 
   let busy = false;
-  async function checkout(amt) {
+  async function checkout() {
+    const amt = total();
+    if (!amt) return;
     // Key ID না থাকলে Razorpay.me লিংক — সেখানে পাঠক নিজে অঙ্কটা লেখেন
     if (!CONFIG.razorpayKey || !window.Razorpay) {
       if (!CONFIG.razorpayMe) return toast("পেমেন্ট এখনো চালু হয়নি");
@@ -129,29 +134,31 @@ function render() {
     toast("পেমেন্ট খুলছে…");
     const orderId = await makeOrder(amt);
     busy = false;
+    const items = summary();
     const rzp = new window.Razorpay({
       key: CONFIG.razorpayKey,
       ...(orderId ? { order_id: orderId } : {}),
       amount: amt * 100, // পয়সায়
       currency: "INR",
       name: "sus.lessons",
-      description: amt >= 100 ? "আড্ডার চা" : amt >= 50 ? "চা আর বিস্কুট" : "এক কাপ চা",
+      description: items.slice(0, 250),
       image: `${CONFIG.siteUrl}/assets/brand/avatar.jpg`,
-      notes: { purpose: "cha", page: location.pathname },
+      notes: { purpose: "cha", items: items.slice(0, 250) },
       theme: { color: "#3e2228" },
-      handler: (r) => thanks(amt, r.razorpay_payment_id),
+      handler: (r) => thanks(amt, items, r.razorpay_payment_id),
     });
     rzp.on("payment.failed", () => toast("পেমেন্ট হলো না — আবার চেষ্টা করুন"));
     rzp.open();
   }
 
-  function thanks(amt, id) {
+  function thanks(amt, items, id) {
     pay.innerHTML = `
       <div class="cha-thanks">
-        <b>চা পেয়ে গেছি — ধন্যবাদ! ☕</b>
-        <p>₹${bn(amt)}-এর চা পৌঁছেছে। পরের গল্পটা আপনার জন্য একটু তাড়াতাড়ি আসবে।</p>
+        <b>পেয়ে গেছি — ধন্যবাদ! ☕</b>
+        <p>${esc(items)} (₹${bn(amt)}) পৌঁছেছে। পরের গল্পটা আপনার জন্য একটু তাড়াতাড়ি আসবে।</p>
         ${id ? `<small>পেমেন্ট আইডি: ${esc(id)}</small>` : ""}
       </div>`;
+    pay.scrollIntoView({ block: "nearest", behavior: "smooth" });
     toast("ধন্যবাদ! ❤️");
   }
 }

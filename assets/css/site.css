@@ -597,33 +597,33 @@ button.nav-follow { font-size: 0.95rem; }
 .kk-confetti i { position: absolute; left: var(--x); top: 0; width: 8px; height: 12px; border-radius: 2px; opacity: 0; animation: fall 1.6s var(--d) ease-in forwards; }
 @keyframes fall { 0% { opacity: 1; transform: translateY(0) rotate(0); } 100% { opacity: 0; transform: translateY(420px) rotate(var(--r)); } }
 
-/* ── চা খাওয়ান পাতা ── */
-.cha { display: grid; grid-template-columns: minmax(200px, 360px) 1fr; gap: clamp(24px, 5vw, 70px); align-items: center; padding: 50px 0 20px; --fill: 0.7; }
-.cha-art { position: relative; max-width: 340px; width: 100%; margin-inline: auto; }
-.cha-cup { width: 100%; height: auto; display: block; }
-.cha-tea { transform: translateY(calc((1 - var(--fill)) * 108px)); transition: transform 0.7s cubic-bezier(0.3, 1.3, 0.5, 1); }
-.cha-steam { position: absolute; left: 22%; right: 30%; top: -14%; height: 40%; display: flex; justify-content: space-around; }
-.cha-steam i { width: 10px; height: 100%; border-radius: 99px; background: linear-gradient(transparent, rgba(107, 93, 80, 0.35), transparent); filter: blur(4px); animation: steam 2.8s ease-in-out infinite; }
-.cha-steam i:nth-child(2) { animation-delay: 0.9s; }
-.cha-steam i:nth-child(3) { animation-delay: 1.8s; }
-@keyframes steam { 0% { opacity: 0; transform: translateY(20px) scaleY(0.6); } 50% { opacity: 1; } 100% { opacity: 0; transform: translateY(-30px) translateX(8px) scaleY(1.1); } }
-.cha-body h1 { font-size: clamp(2rem, 4.6vw, 3rem); }
-.cha-lead { color: var(--muted); font-size: 1.08rem; margin: 10px 0 24px; max-width: 50ch; }
-.cha-cups { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.cha-opt { all: unset; box-sizing: border-box; cursor: pointer; background: var(--paper); border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 2px; box-shadow: inset 0 0 0 1.5px var(--line); transition: 0.2s; }
-.cha-opt b { font: 700 1.4rem/1.2 var(--text); color: var(--maroon); }
-.cha-opt span { font-weight: 600; }
-.cha-opt small { color: var(--muted); font-size: 0.8rem; line-height: 1.35; }
-.cha-opt[aria-checked="true"] { background: var(--maroon); box-shadow: 0 10px 24px -14px rgba(42, 20, 24, 0.8); transform: translateY(-2px); }
-.cha-opt[aria-checked="true"] b { color: var(--gold); }
-.cha-opt[aria-checked="true"] span { color: var(--paper); }
-.cha-opt[aria-checked="true"] small { color: rgba(251, 247, 239, 0.65); }
-.cha-opt:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
-.cha-own { display: flex; align-items: center; gap: 8px; margin: 12px 0 20px; background: var(--paper); border-radius: 16px; padding: 6px 8px 6px 16px; box-shadow: inset 0 0 0 1.5px var(--line); }
-.cha-own > span:first-child { color: var(--muted); font-weight: 600; font-size: 0.92rem; white-space: nowrap; }
-.cha-rs { color: var(--maroon); font-weight: 700; }
-.cha-own input { flex: 1; min-width: 0; border: 0; background: var(--cream); border-radius: 12px; padding: 10px 12px; font: 700 1.05rem var(--text); color: var(--maroon); }
-.cha-own .btn-mini { padding: 11px 16px; }
+/* ── চা খাওয়ান পাতা: চায়ের দোকানের মেনু ── */
+.cha { max-width: 980px; margin: 0 auto; padding: 46px 0 20px; }
+.cha-head { text-align: center; }
+.cha-head h1 { font-size: clamp(2rem, 4.6vw, 3rem); }
+.cha-lead { color: var(--muted); font-size: 1.08rem; margin: 10px auto 30px; max-width: 52ch; }
+.cha-menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.cha-item { background: var(--paper); border-radius: var(--r); overflow: hidden; display: flex; flex-direction: column; box-shadow: inset 0 0 0 1.5px var(--line); transition: box-shadow 0.2s, transform 0.2s; }
+.cha-item.on { box-shadow: inset 0 0 0 2px var(--maroon), 0 14px 28px -18px rgba(42, 20, 24, 0.7); transform: translateY(-2px); }
+.cha-pic { position: relative; aspect-ratio: 1; background: var(--light); }
+.cha-pic img { width: 100%; height: 100%; object-fit: cover; }
+.cha-fav { position: absolute; left: 12px; top: 12px; background: var(--orange); color: var(--paper); font: 700 0.8rem/1 var(--text); padding: 7px 11px; border-radius: 99px; transform: rotate(-4deg); box-shadow: 0 4px 10px -4px rgba(0, 0, 0, 0.4); }
+.cha-info { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.cha-info h2 { font-size: 1.3rem; }
+.cha-info p { color: var(--muted); font-size: 0.88rem; }
+.cha-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; padding-top: 12px; }
+.cha-price { font: 700 1.35rem/1 var(--text); color: var(--maroon); }
+.cha-step { display: flex; align-items: center; background: var(--cream); border-radius: 99px; padding: 4px; }
+.cha-step button { width: 34px; height: 34px; border: 0; border-radius: 50%; background: var(--maroon); color: var(--paper); font: 700 1.2rem/1 var(--text); cursor: pointer; }
+.cha-step button:disabled { opacity: 0.3; cursor: default; }
+.cha-step output { min-width: 34px; text-align: center; font: 700 1.05rem var(--text); color: var(--maroon); }
+.cha-bar { position: sticky; bottom: 14px; z-index: 5; margin-top: 22px; display: flex; align-items: center; gap: 14px; background: var(--maroon); color: var(--paper); border-radius: 20px; padding: 12px 12px 12px 20px; box-shadow: 0 20px 40px -20px rgba(42, 20, 24, 0.8); }
+.cha-sum { flex: 1; min-width: 0; display: grid; line-height: 1.3; }
+.cha-sum small { color: rgba(251, 247, 239, 0.7); font-size: 0.85rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cha-sum b { font: 700 1.3rem/1.3 var(--text); color: var(--gold); }
+.cha-bar .btn { background: var(--gold); color: var(--maroon); padding: 13px 22px; }
+.cha-bar .btn:disabled { opacity: 0.5; cursor: default; }
+.cha-pay { margin-top: 16px; }
 .cha-pay:empty { display: none; }
 .cha-thanks { background: var(--teal); color: var(--paper); border-radius: 18px; padding: 18px 20px; display: grid; gap: 4px; }
 .cha-thanks b { font: 400 1.3rem/1.3 var(--display); }
@@ -634,11 +634,11 @@ button.nav-follow { font-size: 0.95rem; }
 .cha-off p { color: var(--muted); margin: 12px 0 24px; }
 .cha-off-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 @media (max-width: 760px) {
-  .cha { grid-template-columns: 1fr; padding-top: 30px; }
-  .cha-art { max-width: 200px; }
-  .cha-body { text-align: center; }
-  .cha-lead { margin-inline: auto; }
-  .cha-cups { grid-template-columns: 1fr; }
-  .cha-opt { flex-direction: row; flex-wrap: wrap; align-items: baseline; column-gap: 10px; text-align: left; }
-  .cha-opt small { flex-basis: 100%; }
+  .cha { padding-top: 30px; }
+  .cha-menu { grid-template-columns: 1fr; gap: 12px; }
+  .cha-item { flex-direction: row; }
+  .cha-pic { width: 120px; flex: none; }
+  .cha-fav { left: 6px; top: 6px; font-size: 0.68rem; padding: 5px 8px; }
+  .cha-info { padding: 12px 14px; }
+  .cha-info h2 { font-size: 1.12rem; }
 }

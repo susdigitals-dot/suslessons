@@ -568,7 +568,7 @@ async function donationsList() {
   const ok = data.filter((d) => d.status === "captured");
   const total = ok.reduce((n, d) => n + d.amount, 0);
   main().innerHTML = `
-    <div class="top"><h1>চা</h1><span>${num(ok.length)} কাপ · মোট ${price(total)}</span></div>
+    <div class="top"><h1>চা</h1><span>${num(ok.length)} বার · মোট ${price(total)}</span></div>
     <div class="msgs">
       ${data.map((d) => `
         <div class="panel msg${d.status === "captured" ? "" : " done"}">
@@ -580,6 +580,7 @@ async function donationsList() {
             ${d.contact ? `<span>${esc(d.contact)}</span>` : ""}
             <small>${when(d.created_at)}</small>
           </div>
+          ${d.items ? `<p>${esc(d.items)}</p>` : ""}
           <p><small>${esc(d.payment_id)}</small></p>
         </div>`).join("") || `<p class="empty">এখনো কেউ চা খাওয়াননি</p>`}
     </div>`;

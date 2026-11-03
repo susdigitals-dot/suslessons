@@ -53,6 +53,7 @@ Deno.serve(async (req) => {
       email: p.email ?? "",
       contact: p.contact ?? "",
       purpose: p.notes?.purpose ?? "",
+      items: String(p.notes?.items ?? "").slice(0, 250),
     }),
   });
   if (!res.ok) return new Response("db error: " + (await res.text()), { status: 500 });
