@@ -441,9 +441,36 @@ const affItem = (a = {}) => `
   </div>`;
 
 // ── দোকান: বিক্রির জিনিস আর affiliate ───────────────────────────
+// ফিচার বই (কঠিন কথা বলার ৫০টা প্রশ্ন) DB-তে নেই, সাইটের কোডে আছে (assets/js/kothin.js)।
+// ডাউনলোড গোনা হয় track.js-এর ক্লিক থেকে: সরাসরি PDF লিংক, আর FB/Insta-তে WhatsApp-এর লিংক (তার ভেতরেও PDF-এর ঠিকানা থাকে)
+const FEATURE_PDF = "kothin-kotha-50-proshno.pdf";
+
+async function featureDownloads() {
+  const base = () => sb.from("events").select("id", { count: "exact", head: true }).eq("kind", "click").ilike("href", `%${FEATURE_PDF}%`);
+  const week = new Date(Date.now() - 7 * 864e5).toISOString();
+  const day = new Date(Date.now() - 864e5).toISOString();
+  const [all, wa, w, d] = await Promise.all([
+    base(),
+    base().ilike("href", "%wa.me%"),
+    base().gte("created_at", week),
+    base().gte("created_at", day),
+  ]);
+  if (all.error) return `<p class="empty">ডাউনলোডের হিসাব আনা গেল না (${esc(all.error.message)})</p>`;
+  return `
+    <div class="kpis kpis-4">
+      <div class="kpi"><span>মোট ডাউনলোড</span><b>${num(all.count)}</b></div>
+      <div class="kpi"><span>WhatsApp দিয়ে (FB/Insta)</span><b>${num(wa.count)}</b></div>
+      <div class="kpi"><span>গত ৭ দিনে</span><b>${num(w.count)}</b></div>
+      <div class="kpi"><span>আজ (২৪ ঘণ্টা)</span><b>${num(d.count)}</b></div>
+    </div>`;
+}
+
 async function productsList() {
   main().innerHTML = `<div class="skeleton"></div>`;
-  const { data, error } = await sb.from("products").select("id,slug,title,kind,price,buy_url,published,cover_url").order("sort");
+  const [{ data, error }, dl] = await Promise.all([
+    sb.from("products").select("id,slug,title,kind,price,buy_url,published,cover_url").order("sort"),
+    featureDownloads(),
+  ]);
   if (error) return fail(error, true);
   main().innerHTML = `
     <div class="top">
@@ -457,7 +484,21 @@ async function productsList() {
       পেমেন্ট আর ফাইল পাঠানো হয় <b>কেনার লিংক</b>-এর প্ল্যাটফর্মে — Razorpay Payment Page, Instamojo, Cosmofeed বা Gumroad-এ প্রোডাক্ট বানিয়ে
       PDF আপলোড করো, তারপর সেই লিংকটা এখানে বসাও। ক্রেতা টাকা দিলেই ইমেইলে ফাইল পেয়ে যাবে।
     </div>
-    <div class="table">${data.map((p) => row(p, "product")).join("") || `<p class="empty">এখনো কিছু নেই</p>`}</div>`;
+    <div class="panel">
+      <h2>ফিচার বই · দোকানের ওপরে</h2>
+      <div class="row row-feature">
+        <div class="ph"></div>
+        <div>
+          <h3>কঠিন কথা বলার ৫০টা প্রশ্ন</h3>
+          <div class="sub"><span class="status on">প্রকাশিত</span><span>ই-বুক · ফ্রি (চাকা)</span><span>/${esc(FEATURE_PDF)}</span></div>
+        </div>
+        <div class="acts"><a class="btn btn-ghost btn-sm" href="../shop#kothin-kotha" target="_blank">দেখুন</a></div>
+      </div>
+      ${dl}
+      <small class="hint">এই বইটা সাইটের কোডে বসানো, তাই এখান থেকে এডিট হয় না। শুধু আসল সাইটের (${esc(new URL(CONFIG.siteUrl).hostname)}) ডাউনলোড গোনা হয়, admin-এর নিজেরটা নয়।</small>
+    </div>
+    <h2 class="section-h">অন্য প্রোডাক্ট</h2>
+    <div class="table">${data.map((p) => row(p, "product")).join("") || `<p class="empty">এখনো অন্য কোনো প্রোডাক্ট নেই — ওপরের বোতাম দিয়ে যোগ করো</p>`}</div>`;
   $$("[data-new]").forEach((b) => (b.onclick = () => productForm({ kind: b.dataset.new, published: true })));
   bindRows("products", productForm);
 }
