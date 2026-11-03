@@ -1,6 +1,6 @@
-import { getSettings, getProduct } from "./data.js?v=202611031731";
-import "./track.js?v=202611031731";
-import { $, esc, bn, inline, safeUrl, chrome, productMock, priceTag, KINDS, endCard, setMeta } from "./ui.js?v=202611031731";
+import { getSettings, getProduct } from "./data.js?v=202611031735";
+import "./track.js?v=202611031735";
+import { $, esc, bn, inline, safeUrl, chrome, productMock, priceTag, KINDS, endCard, setMeta } from "./ui.js?v=202611031735";
 
 const slug = new URLSearchParams(location.search).get("p") || "";
 const settings = await getSettings();

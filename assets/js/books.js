@@ -1,6 +1,6 @@
-import { getSettings, listBooks } from "./data.js?v=202611031731";
-import "./track.js?v=202611031731";
-import { $, chrome, bookCard } from "./ui.js?v=202611031731";
+import { getSettings, listBooks } from "./data.js?v=202611031735";
+import "./track.js?v=202611031735";
+import { $, chrome, bookCard } from "./ui.js?v=202611031735";
 
 const show = new URLSearchParams(location.search).get("show") || "";
 const settings = await getSettings();

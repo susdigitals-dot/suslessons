@@ -1,7 +1,7 @@
 // দোকানের ফিচার বই — "কঠিন কথা বলার ৫০টা প্রশ্ন"
 // বইয়ের মলাট, উল্টানো যায় এমন প্রশ্ন-কার্ড, আর দাম ঠিক করার চাকা (চাকা সবসময় "ফ্রি"-তে থামে)
-import { $, bn, esc, inline, wordmark } from "./ui.js?v=202611031731";
-import { isIndia } from "./geo.js?v=202611031731";
+import { $, bn, esc, inline, wordmark } from "./ui.js?v=202611031735";
+import { isIndia } from "./geo.js?v=202611031735";
 
 const PDF = "books/kothin-kotha-50-proshno.pdf";
 const SPUN = "kk-spun";
@@ -41,6 +41,7 @@ export function featureHtml() {
   return `
     <section class="kk" id="kothin-kotha" aria-labelledby="kk-title">
       <div class="kk-top">
+        <div class="kk-art">
         <div class="kk-book" aria-hidden="true">
           <div class="kk-cover">
             <span class="kk-c-mark">— sus.lessons —</span>
@@ -51,6 +52,8 @@ export function featureHtml() {
             <span class="kk-q kk-q1">?</span><span class="kk-q kk-q2">?</span>
           </div>
           <div class="kk-pages"></div>
+        </div>
+        <button class="btn btn-maroon kk-dl" type="button" data-wheel>⬇ DOWNLOAD NOW</button>
         </div>
         <div class="kk-copy">
           <span class="eyebrow">নতুন গাইড · PDF</span>
@@ -91,6 +94,7 @@ export function initFeature() {
   const root = $("#kothin-kotha");
   if (!root) return;
   root.addEventListener("click", (e) => {
+    if (e.target.closest("[data-wheel]")) openWheel();
     const card = e.target.closest(".kk-card");
     if (card) {
       const on = card.classList.toggle("on");
@@ -102,7 +106,7 @@ export function initFeature() {
   const fab = document.createElement("button");
   fab.type = "button";
   fab.className = "kk-fab";
-  fab.innerHTML = `<span class="kk-fab-ico" aria-hidden="true">📖</span><span class="kk-fab-txt">আপনার নামে একটা <b>ই-বুক</b> তোলা আছে<small>কঠিন কথা বলার ৫০টা প্রশ্ন · নিয়ে যান →</small></span>`;
+  fab.innerHTML = `<span class="kk-fab-ico" aria-hidden="true">📖</span><span class="kk-fab-txt">আপনার <b>ই-বুক</b> নিন →</span>`;
   fab.addEventListener("click", openWheel);
   document.body.appendChild(fab);
 
@@ -229,7 +233,7 @@ function inappHtml() {
       <a class="btn btn-gold" href="${wa("📖 আমার ই-বুক: কঠিন কথা বলার ৫০টা প্রশ্ন")}" target="_blank" rel="noopener">💬 WhatsApp-এ নিজেকে পাঠান</a>
       <a class="kk-inapp-alt" href="${wa("📖 এই বইটা তোমার কাজে লাগবে — কঠিন কথা বলার ৫০টা প্রশ্ন, একদম ফ্রি:")}" target="_blank" rel="noopener">🤝 অন্য কাউকে পাঠান</a>
       ${ANDROID ? `<a class="kk-inapp-alt" href="${chrome}">🌐 Chrome-এ খুলে নামান</a>` : ""}
-      <div class="kk-copy">
+      <div class="kk-link">
         <input readonly value="${url}" aria-label="বইয়ের লিংক">
         <button type="button" data-copy>লিংক কপি</button>
       </div>
