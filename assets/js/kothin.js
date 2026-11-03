@@ -3,8 +3,8 @@
 import { $, bn, esc, inline, wordmark } from "./ui.js?v=202611031900";
 import { isIndia } from "./geo.js?v=202611031900";
 
-const PDF = "books/kothin-kotha-50-proshno.pdf";
-const SPUN = "kk-spun";
+// চাকা যে বইয়ের জন্য ঘোরে — দোকানের অন্য বইও openWheel-এ নিজের {title, pdf, spun} দেয়
+const BOOK = { title: "কঠিন কথা বলার ৫০টা প্রশ্ন", pdf: "books/kothin-kotha-50-proshno.pdf", spun: "kk-spun" };
 
 // Facebook / Instagram-এর ভেতরের ব্রাউজারে PDF নামানো যায় না (?inapp দিয়ে পরীক্ষা করা যায়)
 export const INAPP = /FBAN|FBAV|FB_IAB|FBIOS|Instagram|Messenger|Threads|; wv\)/i.test(navigator.userAgent) || /[?&]inapp\b/.test(location.search);
@@ -52,7 +52,10 @@ export function featureHtml() {
           </div>
           <div class="kk-pages"></div>
         </div>
-        <button class="btn btn-maroon kk-dl" type="button" data-wheel>⬇ DOWNLOAD NOW</button>
+        <div class="kk-btns">
+          <button class="btn btn-maroon kk-dl" type="button" data-wheel>⬇ DOWNLOAD NOW</button>
+          <button class="btn btn-ghost" type="button" data-wheel>📖 ই-বুক নামান</button>
+        </div>
         </div>
         <div class="kk-copy">
           <span class="eyebrow">নতুন গাইড · PDF</span>
@@ -93,7 +96,7 @@ export function initFeature() {
   const root = $("#kothin-kotha");
   if (!root) return;
   root.addEventListener("click", (e) => {
-    if (e.target.closest("[data-wheel]")) openWheel();
+    if (e.target.closest("[data-wheel]")) openWheel(BOOK);
     const card = e.target.closest(".kk-card");
     if (card) {
       const on = card.classList.toggle("on");
@@ -106,11 +109,11 @@ export function initFeature() {
   fab.type = "button";
   fab.className = "kk-fab";
   fab.innerHTML = `<span class="kk-fab-ico" aria-hidden="true">📖</span><span class="kk-fab-txt">আপনার <b>ই-বুক</b> নিন →</span>`;
-  fab.addEventListener("click", openWheel);
+  fab.addEventListener("click", () => openWheel(BOOK));
   document.body.appendChild(fab);
 
   // ইনস্টাগ্রাম থেকে সোজা চাকায়: /shop#spin
-  if (location.hash === "#spin") openWheel();
+  if (location.hash === "#spin") openWheel(BOOK);
 }
 
 // ── চাকা ───────────────────────────
@@ -142,9 +145,10 @@ function wheelSvg() {
     </svg>`;
 }
 
-let dlg, turned = 0;
+let dlg, book, turned = 0;
 
-function openWheel() {
+export function openWheel(b) {
+  book = b;
   if (!dlg) {
     dlg = document.createElement("dialog");
     dlg.className = "support kk-dlg";
@@ -161,7 +165,7 @@ function openWheel() {
     <button class="close" data-close aria-label="বন্ধ করুন">✕</button>
     ${wordmark()}
     <h2 id="kk-dlg-h">দাম ঠিক করবে চাকা</h2>
-    <p>কঠিন কথা বলার ৫০টা প্রশ্ন — একবার ঘোরান, যেখানে থামবে সেই দামে বই।</p>
+    <p>${esc(book.title)} — একবার ঘোরান, যেখানে থামবে সেই দামে বই।</p>
     <div class="kk-wheel">
       <span class="kk-pin" aria-hidden="true"></span>
       ${wheelSvg()}
@@ -172,7 +176,7 @@ function openWheel() {
   dlg.showModal();
   turned = 0;
   // আগে একবার ঘুরিয়েছেন — চাকা ফ্রি-তে দাঁড়িয়ে, সোজা ফলাফল
-  if (store(SPUN)) {
+  if (store(book.spun)) {
     rotate(0, false);
     result(true);
   }
@@ -199,10 +203,13 @@ function spin() {
   go.disabled = true;
   go.textContent = "ঘুরছে…";
   dlg.querySelector(".kk-wheel").classList.add("spinning");
+  const from = turned;
   rotate(landing());
+  sfx.spin(turned - from);
   setTimeout(() => {
     dlg.querySelector(".kk-wheel").classList.remove("spinning");
-    store(SPUN, "1");
+    store(book.spun, "1");
+    sfx.win();
     result(false);
   }, 5300);
 }
@@ -213,7 +220,7 @@ function result(again) {
     <div class="kk-win${again ? "" : " pop"}">
       <span class="kk-stamp">ফ্রি!</span>
       <p><b>${again ? "আপনার চাকা ফ্রি-তেই থেমেছিলো।" : "চাকা থামলো ফ্রি-তে!"}</b><br>বইটা আপনার — একটা টাকাও লাগবে না।</p>
-      ${INAPP ? inappHtml() : `<a class="btn btn-gold" href="${PDF}" download>⬇ বইটা নামিয়ে নিন (PDF)</a>`}
+      ${INAPP ? inappHtml() : `<a class="btn btn-gold" href="${book.pdf}" download>⬇ বইটা নামিয়ে নিন (PDF)</a>`}
       ${isIndia() ? `<a class="kk-cha" href="cha.html"><span>☕</span><span><b>বইটা কাজে লাগলে, ভাইকে এক কাপ চা?</b><small>পুরোপুরি আপনার ইচ্ছে</small></span><span>→</span></a>` : ""}
     </div>
     ${again ? "" : confetti()}`;
@@ -227,8 +234,8 @@ function result(again) {
 
 // FB/Insta-র ভেতরে PDF নামে না — লিংকটা WhatsApp-এ নিজেকে পাঠিয়ে সেখান থেকে নামানো
 function inappHtml() {
-  const url = new URL(PDF, location.href).href;
-  const wa = `https://wa.me/?text=${encodeURIComponent("📖 আমার ই-বুক: কঠিন কথা বলার ৫০টা প্রশ্ন\n" + url)}`;
+  const url = new URL(book.pdf, location.href).href;
+  const wa = `https://wa.me/?text=${encodeURIComponent(`📖 আমার ই-বুক: ${book.title}\n` + url)}`;
   // আগে একটা ছোট পপআপ বুঝিয়ে দেয় কেন WhatsApp — "বুঝলাম" চাপলেই WhatsApp খোলে
   return `
     <button class="btn btn-gold kk-wa" type="button" data-wa><img src="assets/img/whatsapp.png" alt="" width="26" height="26">PDF DOWNLOAD</button>
@@ -246,3 +253,55 @@ function confetti() {
   return `<div class="kk-confetti" aria-hidden="true">${Array.from({ length: 26 }, (_, i) =>
     `<i style="--x:${Math.round(Math.random() * 100)}%;--d:${(Math.random() * 0.5).toFixed(2)}s;--r:${Math.round(Math.random() * 720 - 360)}deg;background:${colors[i % colors.length]}"></i>`).join("")}</div>`;
 }
+
+// ── চাকার আওয়াজ ───────────────────────────
+// কোনো ফাইল নয়, Web Audio দিয়ে বানানো: প্রতিটা পিন কাঁটা পেরোলে "টিক", থামলে ছোট্ট "টিং-টিং"
+const sfx = (() => {
+  let ac;
+  const ctx = () => {
+    try {
+      ac ||= new (window.AudioContext || window.webkitAudioContext)();
+      if (ac.state === "suspended") ac.resume();
+    } catch {}
+    return ac;
+  };
+  const tone = (freq, at, len, vol, type = "sine") => {
+    const o = ac.createOscillator();
+    const g = ac.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(freq, at);
+    g.gain.setValueAtTime(vol, at);
+    g.gain.exponentialRampToValueAtTime(0.0001, at + len);
+    o.connect(g).connect(ac.destination);
+    o.start(at);
+    o.stop(at + len + 0.02);
+  };
+  // চাকার CSS-এর একই কার্ভ (cubic-bezier(.12,.72,.08,1), ৫.২ সেকেন্ড) থেকে আগেভাগে হিসেব করা:
+  // চাকার গায়ে প্রতি ২৪° একটা পিন, প্রতিটা পিন কাঁটা পেরোনোর মুহূর্তে একটা টিক। চাকা যত ধীর, টিক তত ফাঁকা ফাঁকা
+  function spin(deg) {
+    if (!ctx()) return;
+    const bez = (t, a, b) => 3 * a * t * (1 - t) ** 2 + 3 * b * t * t * (1 - t) + t ** 3;
+    const start = ac.currentTime + 0.03;
+    let gone = 0, prev = -1;
+    for (let i = 1; i <= 2000; i++) {
+      const t = i / 2000;
+      const pins = Math.floor((bez(t, 0.72, 1) * deg) / 24);
+      const at = start + bez(t, 0.12, 0.08) * 5.2;
+      // একদম জোরে ঘোরার সময় টিকগুলো গায়ে গায়ে লেগে যায় — অন্তত ২৫ মিলিসেকেন্ড ফাঁক রাখো
+      if (pins > gone && at - prev > 0.025) {
+        tone(1500 + Math.random() * 300, at, 0.035, 0.12, "triangle");
+        prev = at;
+      }
+      gone = Math.max(gone, pins);
+    }
+  }
+
+  function win() {
+    if (!ctx()) return;
+    const t = ac.currentTime;
+    tone(880, t, 0.25, 0.18);
+    tone(1320, t + 0.12, 0.45, 0.16);
+  }
+
+  return { spin, win };
+})();

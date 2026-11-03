@@ -354,7 +354,11 @@ p { margin: 0; }
 .prod-hero .price b { font-size: 1.9rem; }
 .prod-hero > .prod-mock { position: sticky; top: 100px; }
 .pc-format { color: var(--muted); font-weight: 600; margin-bottom: 18px; }
-.pc-wa { color: var(--muted); font-size: 0.78rem; line-height: 1.4; }
+.pc-cover { all: unset; cursor: pointer; display: block; border-radius: var(--r); }
+.pc-cover:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+.pc-btns { margin-top: auto; width: 100%; display: grid; gap: 8px; }
+.pc-btns .btn { margin-top: 0; }
+.kk-btns { display: grid; gap: 10px; justify-items: stretch; }
 .trust { list-style: none; padding: 16px 20px; margin: 22px 0; background: var(--paper); border-radius: var(--r); display: grid; gap: 6px; color: var(--teal); font-weight: 600; font-size: 0.95rem; }
 .pc-trust { margin: 18px 0; color: var(--muted); font-size: 0.92rem; }
 .prod-desc { margin-top: 10px; color: var(--ink); font-size: 1.05rem; }

@@ -1,12 +1,12 @@
 import { getSettings, listProducts } from "./data.js?v=202611031900";
 import "./track.js?v=202611031900";
-import { $, esc, inline, chrome, productCard, productMock, priceTag, KINDS } from "./ui.js?v=202611031900";
-import { featureHtml, initFeature, INAPP } from "./kothin.js?v=202611032200";
+import { $, esc, inline, chrome, productCard, productMock, KINDS } from "./ui.js?v=202611031900";
+import { featureHtml, initFeature, openWheel } from "./kothin.js?v=202611032300";
 
 const show = new URLSearchParams(location.search).get("kind") || "";
 
-// ফ্রি গাইড — DB-তে নেই, সাইটের কোডে। কার্ড থেকেই সোজা PDF নামে
-const FREE = [
+// সাইটের কোডে রাখা বই (DB-তে নেই) — ফিচার বইয়ের মতোই দুটো বোতাম, দুটোতেই দামের চাকা
+const BOOKS = [
   {
     kind: "guide",
     slug: "aaj-charo-kal-dhoro-na",
@@ -14,25 +14,22 @@ const FREE = [
     subtitle: "যে ৮টা অভ্যাস ==আজই ছাড়বে==, আর যে ৫টা কোনোদিন শুরুই করবে না",
     cover_url: "assets/img/shop/aaj-charo-cover.jpg",
     pdf: "books/aaj-charo-kal-dhoro-na.pdf",
-    price: 0,
+    spun: "kk-spun-aaj-charo",
   },
 ];
 
-// FB/Insta-র ভেতরে PDF নামে না — তখন WhatsApp-এ নিজেকে লিংক পাঠানো
-function freeCard(p) {
-  const url = new URL(p.pdf, location.href).href;
-  const href = INAPP ? `https://wa.me/?text=${encodeURIComponent(`📖 আমার ফ্রি গাইড: ${p.title}\n${url}`)}` : p.pdf;
-  const attrs = INAPP ? ` target="_blank" rel="noopener"` : " download";
+function bookCard(p) {
   return `
     <article class="prod-card" id="${esc(p.slug)}">
-      <a href="${href}"${attrs}>${productMock(p)}</a>
+      <button class="pc-cover" type="button" data-book="${esc(p.slug)}" aria-label="${esc(p.title)}">${productMock(p)}</button>
       <div class="pc-body">
-        <span class="chip chip-free">ফ্রি ${esc(KINDS[p.kind])} · PDF</span>
-        <h3><a href="${href}"${attrs}>${esc(p.title)}</a></h3>
+        <span class="chip">${esc(KINDS[p.kind])} · PDF</span>
+        <h3>${esc(p.title)}</h3>
         <p class="pc-sub">${inline(p.subtitle)}</p>
-        ${priceTag(p)}
-        <a class="btn btn-maroon" href="${href}"${attrs}>${INAPP ? "WhatsApp-এ PDF নিন" : "⬇ ফ্রি-তে নামান"}</a>
-        ${INAPP ? `<small class="pc-wa">Insta/FB থেকে সরাসরি নামে না — WhatsApp-এ নিজেকে পাঠিয়ে সেখান থেকে নামান</small>` : ""}
+        <div class="pc-btns">
+          <button class="btn btn-maroon kk-dl" type="button" data-book="${esc(p.slug)}">⬇ DOWNLOAD NOW</button>
+          <button class="btn btn-ghost" type="button" data-book="${esc(p.slug)}">📖 ই-বুক নামান</button>
+        </div>
       </div>
     </article>`;
 }
@@ -46,7 +43,7 @@ chrome(settings);
 $("#feature").innerHTML = featureHtml();
 initFeature();
 
-const all = [...FREE, ...(await listProducts())];
+const all = [...BOOKS, ...(await listProducts())];
 
 // শুধু যে ধরনের জিনিস আছে, সেই ফিল্টারগুলো দেখাও
 const kinds = Object.keys(KINDS).filter((k) => all.some((p) => p.kind === k));
@@ -57,5 +54,9 @@ if (kinds.length > 1)
 
 const items = show ? all.filter((p) => p.kind === show) : all;
 // ফিচার বইটা তো আছেই — আর কিছু না থাকলে "শীঘ্রই আসছে" না দেখিয়ে ঘরটা লুকিয়ে রাখো
-$("#shop").innerHTML = items.map((p) => (p.pdf ? freeCard(p) : productCard(p))).join("");
+$("#shop").innerHTML = items.map((p) => (p.pdf ? bookCard(p) : productCard(p))).join("");
 $("#shop").hidden = !items.length;
+$("#shop").addEventListener("click", (e) => {
+  const b = BOOKS.find((x) => x.slug === e.target.closest("[data-book]")?.dataset.book);
+  if (b) openWheel(b);
+});
