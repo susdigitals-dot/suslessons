@@ -4,3 +4,4 @@ _old/
 *.pdf
 !books/*.pdf
 .claude/
+_guide/

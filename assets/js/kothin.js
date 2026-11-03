@@ -1,0 +1,215 @@
+// দোকানের ফিচার বই — "কঠিন কথা বলার ৫০টা প্রশ্ন"
+// বইয়ের মলাট, উল্টানো যায় এমন প্রশ্ন-কার্ড, আর দাম ঠিক করার চাকা (চাকা সবসময় "ফ্রি"-তে থামে)
+import { $, bn, esc, inline, wordmark } from "./ui.js";
+import { isIndia } from "./geo.js";
+
+const PDF = "books/kothin-kotha-50-proshno.pdf";
+const SPUN = "kk-spun";
+
+// গাইডের প্রতিটা অধ্যায়ের প্রথম পরিস্থিতি — ওরা কী বলে, আমরা কী বলি না, কী জিজ্ঞেস করি
+const CARDS = [
+  { ch: "বিয়ের কথাবার্তা", n: 15, who: "ছেলের মা", they: "আমরা কিছু চাই না। তবে মেয়েকে নিশ্চয়ই খালি হাতে পাঠাবেন না।", dont: "বুঝেছি, আপনারা দাম চাইছেন।", ask: "খালি হাতে না পাঠানো বলতে আপনারা ঠিক কী বোঝাচ্ছেন?" },
+  { ch: "আত্মীয়দের চাপ", n: 13, who: "মাসি", they: "বিয়েটা কবে করছিস? বয়স তো আর বসে থাকবে না।", dont: "তোমার বিয়েটা কি খুব সুখের হয়েছে?", ask: "তোমার সময়ে বিয়ের সিদ্ধান্তটা কীভাবে নিয়েছিলে, মাসি?" },
+  { ch: "অফিসে ছুটি-বেতন", n: 12, who: "ম্যানেজার", they: "এখন তো রিলিজ চলছে। এখন ছুটি?", dont: "ছুটি না দিলে রিজাইন করবো।", ask: "আমার কাজগুলো কীভাবে সামলে দিয়ে গেলে ছুটিটা সম্ভব হবে?" },
+  { ch: "ধারের টাকা", n: 10, who: "শুভ", they: "দেবো রে দেবো। পালিয়ে যাচ্ছি নাকি?", dont: "তুই কোনোদিনই ফেরত দিবি না, জানি।", ask: "কোন মাস থেকে শুরু করলে তোর সুবিধা হয়?" },
+];
+
+// চাকার ঘর — ঘড়ির কাঁটার দিকে, ওপর থেকে। ফ্রি দু'জায়গায়, পাশাপাশি নয়
+const SLICES = [
+  { label: "ফ্রি", free: true, fill: "#3e2228", ink: "#d6a35c" },
+  { label: "₹৯", fill: "#fbf7ef", ink: "#3e2228" },
+  { label: "₹১৫", fill: "#d6a35c", ink: "#3e2228" },
+  { label: "ফ্রি", free: true, fill: "#3e2228", ink: "#d6a35c" },
+  { label: "₹২১", fill: "#d05a23", ink: "#fbf7ef" },
+];
+const STEP = 360 / SLICES.length;
+
+const store = (k, v) => {
+  try {
+    if (v !== undefined) localStorage.setItem(k, v);
+    return localStorage.getItem(k);
+  } catch {
+    return null;
+  }
+};
+
+export function featureHtml() {
+  return `
+    <section class="kk" id="kothin-kotha" aria-labelledby="kk-title">
+      <div class="kk-top">
+        <div class="kk-book" aria-hidden="true">
+          <div class="kk-cover">
+            <span class="kk-c-mark">— sus.lessons —</span>
+            <span class="kk-c-num">${bn(50)}</span>
+            <span class="kk-c-title">কঠিন কথা বলার<br>৫০টা প্রশ্ন</span>
+            <span class="kk-c-rule"></span>
+            <span class="kk-c-sub">চুপ আর চিৎকারের<br>মাঝের রাস্তা</span>
+            <span class="kk-q kk-q1">?</span><span class="kk-q kk-q2">?</span>
+          </div>
+          <div class="kk-pages"></div>
+        </div>
+        <div class="kk-copy">
+          <span class="eyebrow">নতুন গাইড · PDF</span>
+          <h2 id="kk-title">কঠিন কথা বলার ৫০টা প্রশ্ন</h2>
+          <p class="kk-hook">${inline("রাগের মাথায় যে লাইনটা বেরিয়ে আসে, সেটা ==সম্পর্ক ভাঙে।== একটা শান্ত প্রশ্ন সেই কথাটাই বলে — আর উল্টো দিকের মানুষটাকে ভাবতে বাধ্য করে।")}</p>
+          <ul class="kk-stats">
+            <li><b>${bn(50)}</b><span>প্রশ্ন</span></li>
+            <li><b>${bn(4)}</b><span>পরিস্থিতি</span></li>
+            <li><b>${bn(138)}</b><span>পাতা</span></li>
+            <li><b>📱</b><span>মোবাইলে পড়ার মতো</span></li>
+          </ul>
+          <p class="kk-price"><span>দাম কত?</span> <b>₹৯ · ₹১৫ · ₹২১</b> <em>— নাকি ফ্রি?</em></p>
+          <button class="btn btn-maroon kk-cta" type="button" data-spin>🎡 চাকা ঘুরিয়ে দাম ঠিক করুন</button>
+          <p class="kk-small">একবার ঘোরান — চাকা যেখানে থামবে, বই সেই দামে।</p>
+        </div>
+      </div>
+      <div class="kk-deck">
+        <p class="kk-deck-h"><b>রাগের লাইন → প্রশ্ন।</b> কার্ডে চাপ দিন, দেখুন চিৎকারের বদলে কী জিজ্ঞেস করবেন।</p>
+        <div class="kk-cards">
+          ${CARDS.map((c, i) => `
+            <button class="kk-card" type="button" aria-pressed="false" style="--i:${i}">
+              <span class="kk-face kk-front">
+                <span class="kk-ch">${esc(c.ch)} · ${bn(c.n)}টা প্রশ্ন</span>
+                <span class="kk-who">${esc(c.who)} বললেন—</span>
+                <span class="kk-they">“${esc(c.they)}”</span>
+                <span class="kk-flip">উল্টে দেখুন ↻</span>
+              </span>
+              <span class="kk-face kk-back">
+                <span class="kk-lbl">যেটা বলবেন না</span>
+                <s class="kk-dont">${esc(c.dont)}</s>
+                <span class="kk-lbl kk-lbl-ask">যেটা জিজ্ঞেস করবেন</span>
+                <span class="kk-ask">${esc(c.ask)}</span>
+              </span>
+            </button>`).join("")}
+        </div>
+      </div>
+    </section>`;
+}
+
+export function initFeature() {
+  const root = $("#kothin-kotha");
+  if (!root) return;
+  root.addEventListener("click", (e) => {
+    const card = e.target.closest(".kk-card");
+    if (card) {
+      const on = card.classList.toggle("on");
+      card.setAttribute("aria-pressed", on);
+    }
+    if (e.target.closest("[data-spin]")) openWheel();
+  });
+
+  // ইনস্টাগ্রাম থেকে সোজা চাকায়: shop.html#spin
+  if (location.hash === "#spin") openWheel();
+}
+
+// ── চাকা ───────────────────────────
+function point(deg, r) {
+  const a = (deg * Math.PI) / 180;
+  return [100 + r * Math.sin(a), 100 - r * Math.cos(a)].map((n) => n.toFixed(2));
+}
+
+function wheelSvg() {
+  const slices = SLICES.map((s, i) => {
+    const [x1, y1] = point(i * STEP, 96);
+    const [x2, y2] = point((i + 1) * STEP, 96);
+    const mid = i * STEP + STEP / 2;
+    const [tx, ty] = point(mid, 64);
+    return `
+      <path d="M100 100 L${x1} ${y1} A96 96 0 0 1 ${x2} ${y2} Z" fill="${s.fill}" stroke="#ece4d6" stroke-width="2"/>
+      <text x="${tx}" y="${ty}" transform="rotate(${mid} ${tx} ${ty})" fill="${s.ink}" text-anchor="middle" dominant-baseline="central" class="kk-w-txt${s.free ? " free" : ""}">${s.label}</text>`;
+  }).join("");
+  const dots = Array.from({ length: SLICES.length * 3 }, (_, i) => {
+    const [x, y] = point(i * (STEP / 3), 99);
+    return `<circle cx="${x}" cy="${y}" r="1.6" fill="#d6a35c"/>`;
+  }).join("");
+  return `
+    <svg viewBox="-4 -4 208 208" class="kk-wheel-svg" role="img" aria-label="দামের চাকা: ফ্রি, ৯ টাকা, ১৫ টাকা, ফ্রি, ২১ টাকা">
+      <circle cx="100" cy="100" r="102" fill="#3e2228"/>
+      <g class="kk-rotor">${slices}${dots}</g>
+      <circle cx="100" cy="100" r="17" fill="#ece4d6" stroke="#3e2228" stroke-width="3"/>
+      <text x="100" y="100" text-anchor="middle" dominant-baseline="central" class="kk-w-hub">?</text>
+    </svg>`;
+}
+
+let dlg, turned = 0;
+
+function openWheel() {
+  if (!dlg) {
+    dlg = document.createElement("dialog");
+    dlg.className = "support kk-dlg";
+    dlg.setAttribute("aria-labelledby", "kk-dlg-h");
+    document.body.appendChild(dlg);
+    dlg.addEventListener("click", (e) => {
+      if (e.target === dlg || e.target.closest("[data-close]")) dlg.close();
+      if (e.target.closest("[data-go]")) spin();
+    });
+  }
+  dlg.innerHTML = `
+    <button class="close" data-close aria-label="বন্ধ করুন">✕</button>
+    ${wordmark()}
+    <h2 id="kk-dlg-h">দাম ঠিক করবে চাকা</h2>
+    <p>কঠিন কথা বলার ৫০টা প্রশ্ন — একবার ঘোরান, যেখানে থামবে সেই দামে বই।</p>
+    <div class="kk-wheel">
+      <span class="kk-pin" aria-hidden="true"></span>
+      ${wheelSvg()}
+    </div>
+    <div class="kk-out" aria-live="polite">
+      <button class="btn btn-maroon kk-go" type="button" data-go>চাকা ঘোরান 🎡</button>
+    </div>`;
+  dlg.showModal();
+  turned = 0;
+  // আগে একবার ঘুরিয়েছেন — চাকা ফ্রি-তে দাঁড়িয়ে, সোজা ফলাফল
+  if (store(SPUN)) {
+    rotate(0, false);
+    result(true);
+  }
+}
+
+// ফ্রি ঘরের কোনো এক জায়গায় থামাও — কখনো কখনো ধার ঘেঁষে, যাতে "প্রায় ₹২১!" মনে হয়
+function landing() {
+  const free = SLICES.map((s, i) => (s.free ? i : -1)).filter((i) => i >= 0);
+  const i = free[Math.floor(Math.random() * free.length)];
+  const wobble = (Math.random() * 2 - 1) * (STEP / 2 - 5);
+  return i * STEP + STEP / 2 + wobble;
+}
+
+function rotate(at, animate = true) {
+  const rotor = dlg.querySelector(".kk-rotor");
+  const base = Math.ceil(turned / 360) * 360;
+  turned = base + (animate ? 360 * 6 : 0) + (360 - at);
+  rotor.style.transition = animate ? "transform 5.2s cubic-bezier(.12,.72,.08,1)" : "none";
+  rotor.style.transform = `rotate(${turned}deg)`;
+}
+
+function spin() {
+  const go = dlg.querySelector(".kk-go");
+  go.disabled = true;
+  go.textContent = "ঘুরছে…";
+  dlg.querySelector(".kk-wheel").classList.add("spinning");
+  rotate(landing());
+  setTimeout(() => {
+    dlg.querySelector(".kk-wheel").classList.remove("spinning");
+    store(SPUN, "1");
+    result(false);
+  }, 5300);
+}
+
+function result(again) {
+  const out = dlg.querySelector(".kk-out");
+  out.innerHTML = `
+    <div class="kk-win${again ? "" : " pop"}">
+      <span class="kk-stamp">ফ্রি!</span>
+      <p><b>${again ? "আপনার চাকা ফ্রি-তেই থেমেছিলো।" : "চাকা থামলো ফ্রি-তে!"}</b><br>বইটা আপনার — একটা টাকাও লাগবে না।</p>
+      <a class="btn btn-gold" href="${PDF}" download>⬇ বইটা নামিয়ে নিন (PDF)</a>
+      ${isIndia() ? `<a class="kk-cha" href="cha.html"><span>☕</span><span><b>বইটা কাজে লাগলে, দাদাকে এক কাপ চা?</b><small>পুরোপুরি আপনার ইচ্ছে</small></span><span>→</span></a>` : ""}
+    </div>
+    ${again ? "" : confetti()}`;
+  // ছোট স্ক্রিনে ফলাফলটা চাকার নিচে লুকিয়ে না থাকে
+  out.querySelector(".kk-win").scrollIntoView({ block: "nearest", behavior: again ? "auto" : "smooth" });
+}
+
+function confetti() {
+  const colors = ["#d6a35c", "#d05a23", "#3e2228", "#24575a", "#fbf7ef"];
+  return `<div class="kk-confetti" aria-hidden="true">${Array.from({ length: 26 }, (_, i) =>
+    `<i style="--x:${Math.round(Math.random() * 100)}%;--d:${(Math.random() * 0.5).toFixed(2)}s;--r:${Math.round(Math.random() * 720 - 360)}deg;background:${colors[i % colors.length]}"></i>`).join("")}</div>`;
+}
