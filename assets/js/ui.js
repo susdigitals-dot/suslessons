@@ -81,6 +81,10 @@ const LEGAL = [
 ];
 
 export function chrome(settings) {
+  // যেকোনো "ফলো করুন" বোতামে চাপলে তিনটে অপশন
+  document.addEventListener("click", (e) => {
+    if (e.target.closest("[data-follow]")) followDialog(settings);
+  });
   const here = location.pathname.split("/").pop() || "index.html";
   const header = $("#site-header");
   if (header) {
@@ -90,7 +94,7 @@ export function chrome(settings) {
         <button class="menu-btn" aria-label="মেনু" aria-expanded="false"><span></span><span></span></button>
         <nav class="nav">
           ${NAV.map(([href, label]) => `<a href="${href}"${href === here ? ' aria-current="page"' : ""}>${label}</a>`).join("")}
-          <a class="pill pill-maroon nav-follow" href="${safeUrl(settings.instagram)}" target="_blank" rel="noopener">ফলো করুন</a>
+          <button class="pill pill-maroon nav-follow" type="button" data-follow>ফলো করুন</button>
         </nav>
       </div>`;
     const btn = $(".menu-btn", header);
@@ -275,9 +279,48 @@ export function endCard(line, settings, sub = "এমন আরও গল্প�
         <p class="end-line">${inline(line)}</p>
         <span class="end-rule"></span>
         <p class="end-sub">${esc(sub)}</p>
-        <a class="follow-pill" href="${safeUrl(settings.instagram)}" target="_blank" rel="noopener">${avatar(34)}<span>ফলো করুন <b>sus.lessons</b></span></a>
+        <button class="follow-pill" type="button" data-follow>${avatar(34)}<span>ফলো করুন <b>sus.lessons</b></span></button>
       </div>
     </section>`;
+}
+
+// ── ফলো করুন: YouTube, Facebook, Instagram ───────────────────────────
+const ICONS = {
+  youtube: `<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="3" y="10" width="42" height="29" rx="9" fill="#FF0000"/><path d="M20 18.5v12l10.5-6z" fill="#fff"/></svg>`,
+  facebook: `<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="4" y="4" width="40" height="40" rx="10" fill="#0866FF"/><path d="M31.5 44V30.6h4.4l.7-5.2h-5.1v-3.3c0-1.5.4-2.5 2.6-2.5H37v-4.6a37 37 0 0 0-4-.2c-4 0-6.7 2.4-6.7 6.9v3.7h-4.5v5.2h4.5V44z" fill="#fff"/></svg>`,
+  instagram: `<svg viewBox="0 0 48 48" aria-hidden="true"><defs><radialGradient id="igg" cx="0.25" cy="1.05" r="1.25"><stop offset="0" stop-color="#FED373"/><stop offset=".25" stop-color="#F15245"/><stop offset=".55" stop-color="#D92E7F"/><stop offset=".8" stop-color="#9B36B7"/><stop offset="1" stop-color="#515ECF"/></radialGradient></defs><rect x="4" y="4" width="40" height="40" rx="11" fill="url(#igg)"/><rect x="12" y="12" width="24" height="24" rx="7" fill="none" stroke="#fff" stroke-width="3"/><circle cx="24" cy="24" r="5.6" fill="none" stroke="#fff" stroke-width="3"/><circle cx="31.3" cy="16.7" r="1.9" fill="#fff"/></svg>`,
+};
+
+export function followDialog(settings) {
+  let dlg = $("#follow");
+  if (!dlg) {
+    dlg = document.createElement("dialog");
+    dlg.id = "follow";
+    dlg.className = "support follow-sheet";
+    document.body.appendChild(dlg);
+    dlg.addEventListener("click", (e) => {
+      if (e.target === dlg || e.target.closest("[data-close]")) dlg.close();
+    });
+  }
+  const ways = [
+    ["youtube", "YouTube", "ভিডিও গল্প দেখুন", settings.youtube],
+    ["facebook", "Facebook", "পেজে ফলো করুন", settings.facebook],
+    ["instagram", "Instagram", "রিল আর গল্প", settings.instagram],
+  ].filter((w) => w[3]);
+  dlg.innerHTML = `
+    <button class="close" data-close aria-label="বন্ধ করুন">✕</button>
+    ${wordmark()}
+    <h2>ফলো করুন</h2>
+    ${settings.followers ? `<p>${esc(settings.followers)} ফলোয়ার — আপনিও যোগ দিন</p>` : ""}
+    <div class="follow-list">
+      ${ways.map(([k, name, sub, url]) => `
+        <a class="follow-row follow-${k}" href="${safeUrl(url)}" target="_blank" rel="noopener" aria-label="${name}-এ ফলো করুন" data-close>
+          <span class="follow-icon">${ICONS[k]}</span>
+          <span class="follow-text"><b>${name}</b><small>${sub}</small></span>
+          <span class="follow-go">↗</span>
+        </a>`).join("")}
+    </div>`;
+  dlg.showModal();
 }
 
 // ── চা খাওয়ান (সাপোর্ট) ───────────────────────────
