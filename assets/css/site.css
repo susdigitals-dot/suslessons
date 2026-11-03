@@ -563,6 +563,8 @@ button.nav-follow { font-size: 0.95rem; }
   animation: fab-in 0.6s 0.8s cubic-bezier(0.2, 1.4, 0.4, 1) both;
 }
 .kk-fab b { color: var(--gold); font-weight: 700; }
+.kk-fab-txt { text-align: left; }
+.kk-fab-txt small { display: block; font-size: 0.78rem; font-weight: 500; opacity: 0.8; margin-top: 2px; }
 .kk-fab-ico { width: 40px; height: 40px; border-radius: 50%; background: var(--gold); display: grid; place-items: center; font-size: 1.3rem; animation: wiggle 3.2s 2s ease-in-out infinite; }
 .kk-fab:hover .kk-fab-ico { animation-duration: 0.8s; }
 .kk-fab:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }

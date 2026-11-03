@@ -1,7 +1,7 @@
 // দোকানের ফিচার বই — "কঠিন কথা বলার ৫০টা প্রশ্ন"
 // বইয়ের মলাট, উল্টানো যায় এমন প্রশ্ন-কার্ড, আর দাম ঠিক করার চাকা (চাকা সবসময় "ফ্রি"-তে থামে)
-import { $, bn, esc, inline, wordmark } from "./ui.js?v=202611031512";
-import { isIndia } from "./geo.js?v=202611031512";
+import { $, bn, esc, inline, wordmark } from "./ui.js?v=202611031627";
+import { isIndia } from "./geo.js?v=202611031627";
 
 const PDF = "books/kothin-kotha-50-proshno.pdf";
 const SPUN = "kk-spun";
@@ -94,11 +94,11 @@ export function initFeature() {
     }
   });
 
-  // সবসময় ভেসে থাকা বোতাম — দাম বা চাকার কথা নয়, শুধু একটা চমক
+  // সবসময় ভেসে থাকা বোতাম — দাম বা চাকার কথা নয়, শুধু বোঝা যাক একটা ই-বুক অপেক্ষা করছে
   const fab = document.createElement("button");
   fab.type = "button";
   fab.className = "kk-fab";
-  fab.innerHTML = `<span class="kk-fab-ico" aria-hidden="true">🎁</span><span>আপনার জন্য একটা <b>চমক</b> রাখা আছে</span>`;
+  fab.innerHTML = `<span class="kk-fab-ico" aria-hidden="true">📖</span><span class="kk-fab-txt">আপনার নামে একটা <b>ই-বুক</b> তোলা আছে<small>কঠিন কথা বলার ৫০টা প্রশ্ন · নিয়ে যান →</small></span>`;
   fab.addEventListener("click", openWheel);
   document.body.appendChild(fab);
 

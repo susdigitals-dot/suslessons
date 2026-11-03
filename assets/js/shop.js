@@ -1,7 +1,7 @@
-import { getSettings, listProducts } from "./data.js?v=202611031512";
-import "./track.js?v=202611031512";
-import { $, chrome, productCard, KINDS } from "./ui.js?v=202611031512";
-import { featureHtml, initFeature } from "./kothin.js?v=202611031512";
+import { getSettings, listProducts } from "./data.js?v=202611031627";
+import "./track.js?v=202611031627";
+import { $, chrome, productCard, KINDS } from "./ui.js?v=202611031627";
+import { featureHtml, initFeature } from "./kothin.js?v=202611031627";
 
 const show = new URLSearchParams(location.search).get("kind") || "";
 

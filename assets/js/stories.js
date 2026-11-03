@@ -1,6 +1,6 @@
-import { getSettings, listStories } from "./data.js?v=202611031512";
-import "./track.js?v=202611031512";
-import { $, esc, chrome, storyCard } from "./ui.js?v=202611031512";
+import { getSettings, listStories } from "./data.js?v=202611031627";
+import "./track.js?v=202611031627";
+import { $, esc, chrome, storyCard } from "./ui.js?v=202611031627";
 
 const tag = new URLSearchParams(location.search).get("tag") || "";
 
