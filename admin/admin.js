@@ -1,8 +1,8 @@
 // sus.lessons admin — গল্প, স্লাইড গল্প, বই আর সেটিংস লেখার জায়গা
-import { CONFIG } from "../assets/js/config.js?v=202611031824";
-import { SEED } from "../assets/js/seed.js?v=202611031824";
-import { live, sb } from "../assets/js/data.js?v=202611031824";
-import { $, $$, esc, avatar, wordmark, toast, KINDS, price } from "../assets/js/ui.js?v=202611031824";
+import { CONFIG } from "../assets/js/config.js?v=202611031842";
+import { SEED } from "../assets/js/seed.js?v=202611031842";
+import { live, sb } from "../assets/js/data.js?v=202611031842";
+import { $, $$, esc, avatar, wordmark, toast, KINDS, price } from "../assets/js/ui.js?v=202611031842";
 
 const app = $("#app");
 let user = null;

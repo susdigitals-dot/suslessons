@@ -1,14 +1,13 @@
 // দোকানের ফিচার বই — "কঠিন কথা বলার ৫০টা প্রশ্ন"
 // বইয়ের মলাট, উল্টানো যায় এমন প্রশ্ন-কার্ড, আর দাম ঠিক করার চাকা (চাকা সবসময় "ফ্রি"-তে থামে)
-import { $, bn, esc, inline, wordmark } from "./ui.js?v=202611031824";
-import { isIndia } from "./geo.js?v=202611031824";
+import { $, bn, esc, inline, wordmark } from "./ui.js?v=202611031842";
+import { isIndia } from "./geo.js?v=202611031842";
 
 const PDF = "books/kothin-kotha-50-proshno.pdf";
 const SPUN = "kk-spun";
 
 // Facebook / Instagram-এর ভেতরের ব্রাউজারে PDF নামানো যায় না (?inapp দিয়ে পরীক্ষা করা যায়)
 const INAPP = /FBAN|FBAV|FB_IAB|FBIOS|Instagram|Messenger|Threads|; wv\)/i.test(navigator.userAgent) || /[?&]inapp\b/.test(location.search);
-const ANDROID = /Android/i.test(navigator.userAgent);
 
 // গাইডের প্রতিটা অধ্যায়ের প্রথম পরিস্থিতি — ওরা কী বলে, আমরা কী বলি না, কী জিজ্ঞেস করি
 const CARDS = [
@@ -154,8 +153,6 @@ function openWheel() {
     dlg.addEventListener("click", (e) => {
       if (e.target === dlg || e.target.closest("[data-close]")) dlg.close();
       if (e.target.closest("[data-go]")) spin();
-      const copy = e.target.closest("[data-copy]");
-      if (copy) copyLink(copy);
     });
   }
   dlg.innerHTML = `
@@ -226,36 +223,11 @@ function result(again) {
   setTimeout(show, again ? 0 : 650);
 }
 
-// FB/Insta-র ভেতরে: WhatsApp-এ পাঠানো, Chrome-এ খোলা, বা লিংক কপি
+// FB/Insta-র ভেতরে PDF নামে না — লিংকটা WhatsApp-এ নিজেকে পাঠিয়ে সেখান থেকে নামানো
 function inappHtml() {
   const url = new URL(PDF, location.href).href;
-  const wa = (text) => `https://wa.me/?text=${encodeURIComponent(text + "\n" + url)}`;
-  const chrome = `intent://${url.replace(/^https?:\/\//, "")}#Intent;scheme=https;package=com.android.chrome;end`;
-  return `
-    <div class="kk-inapp">
-      <p class="kk-inapp-note">📱 Facebook / Instagram-এর ভেতরে PDF নামানো যায় না। নিচের যেকোনো একটা উপায়ে বইটা নিয়ে নিন:</p>
-      <a class="btn btn-gold" href="${wa("📖 আমার ই-বুক: কঠিন কথা বলার ৫০টা প্রশ্ন")}" target="_blank" rel="noopener">💬 WhatsApp-এ নিজেকে পাঠান</a>
-      <a class="kk-inapp-alt" href="${wa("📖 এই বইটা তোমার কাজে লাগবে — কঠিন কথা বলার ৫০টা প্রশ্ন, একদম ফ্রি:")}" target="_blank" rel="noopener">🤝 অন্য কাউকে পাঠান</a>
-      ${ANDROID ? `<a class="kk-inapp-alt" href="${chrome}">🌐 Chrome-এ খুলে নামান</a>` : ""}
-      <div class="kk-link">
-        <input readonly value="${url}" aria-label="বইয়ের লিংক">
-        <button type="button" data-copy>লিংক কপি</button>
-      </div>
-      <small class="kk-inapp-tip">কপি করে Chrome বা Safari-তে পেস্ট করুন, সেখান থেকে ডাউনলোড হবে।</small>
-    </div>`;
-}
-
-async function copyLink(btn) {
-  const input = btn.previousElementSibling;
-  try {
-    await navigator.clipboard.writeText(input.value);
-  } catch {
-    // কিছু অ্যাপের ব্রাউজারে clipboard API নেই
-    input.select();
-    document.execCommand("copy");
-  }
-  btn.textContent = "কপি হয়েছে ✓";
-  setTimeout(() => (btn.textContent = "লিংক কপি"), 2200);
+  const wa = `https://wa.me/?text=${encodeURIComponent("📖 আমার ই-বুক: কঠিন কথা বলার ৫০টা প্রশ্ন\n" + url)}`;
+  return `<a class="btn btn-gold kk-wa" href="${wa}" target="_blank" rel="noopener"><img src="assets/img/whatsapp.png" alt="" width="26" height="26">PDF DOWNLOAD</a>`;
 }
 
 function confetti() {

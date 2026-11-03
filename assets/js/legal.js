@@ -1,7 +1,7 @@
 // আইনি পাতা (Privacy, Terms, Refund, Disclosure) — লেখা HTML-এ, ব্যবসার তথ্য সেটিংস থেকে
-import { getSettings } from "./data.js?v=202611031824";
-import "./track.js?v=202611031824";
-import { chrome, fillBiz } from "./ui.js?v=202611031824";
+import { getSettings } from "./data.js?v=202611031842";
+import "./track.js?v=202611031842";
+import { chrome, fillBiz } from "./ui.js?v=202611031842";
 
 const settings = await getSettings();
 chrome(settings);
