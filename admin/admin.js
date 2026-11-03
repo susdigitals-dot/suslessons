@@ -107,6 +107,7 @@ function shell() {
         <button data-view="books">📚 বই</button>
         <button data-view="products">🛍️ দোকান</button>
         <button data-view="messages">📩 মেসেজ</button>
+        <button data-view="donations">☕ চা</button>
         <button data-view="settings">⚙️ সেটিংস</button>
         <a href="../index.html" target="_blank">↗ সাইট দেখুন</a>
         <div class="grow"></div>
@@ -126,7 +127,7 @@ function go(v) {
   view = v;
   if (liveCh) sb.removeChannel(liveCh), (liveCh = null);
   $$(".side [data-view]").forEach((b) => b.setAttribute("aria-current", b.dataset.view === v));
-  ({ dashboard, stories: storiesList, books: booksList, products: productsList, messages: messagesList, settings: settingsForm })[v]();
+  ({ dashboard, stories: storiesList, books: booksList, products: productsList, messages: messagesList, donations: donationsList, settings: settingsForm })[v]();
 }
 
 const main = () => $("#main");
@@ -556,6 +557,32 @@ async function messagesList() {
     const { error } = await sb.from("messages").delete().eq("id", b.dataset.delmsg);
     error ? fail(error) : go("messages");
   }));
+}
+
+// ── চা খাওয়ানো (Razorpay webhook → donations) ───────────────────────────
+async function donationsList() {
+  main().innerHTML = `<div class="skeleton"></div>`;
+  const { data, error } = await sb.from("donations").select("*").order("created_at", { ascending: false }).limit(300);
+  if (error) return fail(error, true);
+  const when = (t) => new Date(t).toLocaleString("bn-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
+  const ok = data.filter((d) => d.status === "captured");
+  const total = ok.reduce((n, d) => n + d.amount, 0);
+  main().innerHTML = `
+    <div class="top"><h1>চা</h1><span>${num(ok.length)} কাপ · মোট ${price(total)}</span></div>
+    <div class="msgs">
+      ${data.map((d) => `
+        <div class="panel msg${d.status === "captured" ? "" : " done"}">
+          <div class="msg-head">
+            <b>${price(d.amount)}</b>
+            <span class="status ${d.status === "captured" ? "on" : "off"}">${d.status === "captured" ? "পেয়েছি" : "ব্যর্থ"}</span>
+            <span>${esc(d.method)}</span>
+            ${d.email ? `<a href="mailto:${esc(d.email)}">${esc(d.email)}</a>` : ""}
+            ${d.contact ? `<span>${esc(d.contact)}</span>` : ""}
+            <small>${when(d.created_at)}</small>
+          </div>
+          <p><small>${esc(d.payment_id)}</small></p>
+        </div>`).join("") || `<p class="empty">এখনো কেউ চা খাওয়াননি</p>`}
+    </div>`;
 }
 
 // ── সেটিংস ───────────────────────────

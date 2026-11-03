@@ -209,6 +209,25 @@ create policy "messages anyone insert" on public.messages for insert to anon, au
 drop policy if exists "messages admin all" on public.messages;
 create policy "messages admin all" on public.messages for all using (public.is_admin()) with check (public.is_admin());
 
+-- ── চা খাওয়ানো (Razorpay) ───────────────────────────
+-- লেখে শুধু razorpay-webhook Edge Function (service role), পড়তে পারবে শুধু admin
+create table if not exists public.donations (
+  id bigint generated always as identity primary key,
+  payment_id text unique not null,
+  order_id text not null default '',
+  amount int not null,                     -- টাকায়
+  status text not null default 'captured', -- captured / failed
+  method text not null default '',         -- upi, card, netbanking …
+  email text not null default '',
+  contact text not null default '',
+  purpose text not null default '',        -- cha
+  created_at timestamptz not null default now()
+);
+create index if not exists donations_time_idx on public.donations (created_at desc);
+alter table public.donations enable row level security;
+drop policy if exists "donations admin all" on public.donations;
+create policy "donations admin all" on public.donations for all using (public.is_admin()) with check (public.is_admin());
+
 -- ── প্রথম অ্যাডমিন ───────────────────────────
 -- যে ইমেইল দিয়ে admin প্যানেলে লগইন করবে, সেটা এখানে দাও
 insert into public.admins (email) values ('maitys8289@gmail.com') on conflict do nothing;

@@ -1,4 +1,4 @@
-// চা খাওয়ান — শুধু ভারতের পাঠকদের জন্য (Razorpay পপআপ)। বাংলাদেশ বা অন্য দেশ থেকে এলে পাতাটা চা দেখায় না।
+// চা খাওয়ান — শুধু ভারতের পাঠকদের জন্য (Razorpay পপআপ, order আসে supabase/functions/cha-order থেকে)। বাংলাদেশ বা অন্য দেশ থেকে এলে পাতাটা চা দেখায় না।
 import { CONFIG } from "./config.js";
 import { getSettings } from "./data.js";
 import "./track.js";
@@ -100,7 +100,23 @@ function render() {
 
   fillCup(CUPS.find((c) => c.pick).fill);
 
-  function checkout(amt) {
+  // Supabase-এর cha-order function থেকে Razorpay order — না পেলে order ছাড়াই পপআপ খোলে
+  async function makeOrder(amt) {
+    try {
+      const res = await fetch(`${CONFIG.supabaseUrl}/functions/v1/cha-order`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", apikey: CONFIG.supabaseAnonKey, Authorization: `Bearer ${CONFIG.supabaseAnonKey}` },
+        body: JSON.stringify({ amount: amt }),
+      });
+      const o = await res.json();
+      return res.ok && o.id ? o.id : "";
+    } catch {
+      return "";
+    }
+  }
+
+  let busy = false;
+  async function checkout(amt) {
     // Key ID না থাকলে Razorpay.me লিংক — সেখানে পাঠক নিজে অঙ্কটা লেখেন
     if (!CONFIG.razorpayKey || !window.Razorpay) {
       if (!CONFIG.razorpayMe) return toast("পেমেন্ট এখনো চালু হয়নি");
@@ -108,8 +124,14 @@ function render() {
       window.open(CONFIG.razorpayMe, "_blank", "noopener");
       return;
     }
+    if (busy) return;
+    busy = true;
+    toast("পেমেন্ট খুলছে…");
+    const orderId = await makeOrder(amt);
+    busy = false;
     const rzp = new window.Razorpay({
       key: CONFIG.razorpayKey,
+      ...(orderId ? { order_id: orderId } : {}),
       amount: amt * 100, // পয়সায়
       currency: "INR",
       name: "sus.lessons",
