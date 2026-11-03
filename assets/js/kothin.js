@@ -4,7 +4,7 @@ import { $, bn, esc, inline, wordmark } from "./ui.js?v=202611031900";
 import { isIndia } from "./geo.js?v=202611031900";
 
 // চাকা যে বইয়ের জন্য ঘোরে — দোকানের অন্য বইও openWheel-এ নিজের {title, pdf, spun} দেয়
-const BOOK = { title: "কঠিন কথা বলার ৫০টা প্রশ্ন", pdf: "books/kothin-kotha-50-proshno.pdf", spun: "kk-spun" };
+const BOOK = { title: "কঠিন কথা বলার ৫০টা প্রশ্ন", tag: "চুপ আর চিৎকারের মাঝের রাস্তা", pdf: "books/kothin-kotha-50-proshno.pdf", spun: "kk-spun" };
 
 // Facebook / Instagram-এর ভেতরের ব্রাউজারে PDF নামানো যায় না (?inapp দিয়ে পরীক্ষা করা যায়)
 export const INAPP = /FBAN|FBAV|FB_IAB|FBIOS|Instagram|Messenger|Threads|; wv\)/i.test(navigator.userAgent) || /[?&]inapp\b/.test(location.search);
@@ -92,7 +92,8 @@ export function featureHtml() {
     </section>`;
 }
 
-export function initFeature() {
+// more: দোকানের বাকি বই — ভাসমান বোতাম চাপলে আগে জিজ্ঞেস করে কোনটা নেবেন
+export function initFeature(more = []) {
   const root = $("#kothin-kotha");
   if (!root) return;
   root.addEventListener("click", (e) => {
@@ -109,7 +110,7 @@ export function initFeature() {
   fab.type = "button";
   fab.className = "kk-fab";
   fab.innerHTML = `<span class="kk-fab-ico" aria-hidden="true">📖</span><span class="kk-fab-txt">আপনার <b>ই-বুক</b> নিন →</span>`;
-  fab.addEventListener("click", () => openWheel(BOOK));
+  fab.addEventListener("click", () => (more.length ? pickBook([BOOK, ...more]) : openWheel(BOOK)));
   document.body.appendChild(fab);
 
   // ইনস্টাগ্রাম থেকে সোজা চাকায়: /shop#spin
@@ -147,8 +148,7 @@ function wheelSvg() {
 
 let dlg, book, turned = 0;
 
-export function openWheel(b) {
-  book = b;
+function dialog() {
   if (!dlg) {
     dlg = document.createElement("dialog");
     dlg.className = "support kk-dlg";
@@ -159,9 +159,35 @@ export function openWheel(b) {
       if (e.target.closest("[data-go]")) spin();
       if (e.target.closest("[data-wa]")) dlg.querySelector(".kk-wapop").hidden = false;
       if (e.target.closest("[data-ok]")) dlg.querySelector(".kk-wapop").hidden = true;
+      const pick = e.target.closest("[data-pick]");
+      if (pick) openWheel(picks[pick.dataset.pick]);
     });
   }
-  dlg.innerHTML = `
+  return dlg;
+}
+
+// কোন বইটা? — প্রতিটা বই মলাট আর নাম সহ, চাপলেই সেই বইয়ের চাকা
+let picks = [];
+function pickBook(list) {
+  picks = list;
+  dialog().innerHTML = `
+    <button class="close" data-close aria-label="বন্ধ করুন">✕</button>
+    ${wordmark()}
+    <h2 id="kk-dlg-h">কোন বইটা নেবেন?</h2>
+    <div class="kk-picks">
+      ${list.map((b, i) => `
+        <button class="kk-pick" type="button" data-pick="${i}">
+          ${b.cover_url ? `<img src="${esc(b.cover_url)}" alt="" width="56" height="70">` : `<span class="kk-pick-c">${bn(50)}</span>`}
+          <span><b>${esc(b.title)}</b><small>${esc(b.tag || "PDF ই-বুক")}</small></span>
+          <span aria-hidden="true">→</span>
+        </button>`).join("")}
+    </div>`;
+  if (!dlg.open) dlg.showModal();
+}
+
+export function openWheel(b) {
+  book = b;
+  dialog().innerHTML = `
     <button class="close" data-close aria-label="বন্ধ করুন">✕</button>
     ${wordmark()}
     <h2 id="kk-dlg-h">দাম ঠিক করবে চাকা</h2>
@@ -173,7 +199,7 @@ export function openWheel(b) {
     <div class="kk-out" aria-live="polite">
       <button class="btn btn-maroon kk-go" type="button" data-go>চাকা ঘোরান 🎡</button>
     </div>`;
-  dlg.showModal();
+  if (!dlg.open) dlg.showModal();
   turned = 0;
   // আগে একবার ঘুরিয়েছেন — চাকা ফ্রি-তে দাঁড়িয়ে, সোজা ফলাফল
   if (store(book.spun)) {

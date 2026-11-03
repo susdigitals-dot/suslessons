@@ -1,7 +1,7 @@
 import { getSettings, listProducts } from "./data.js?v=202611031900";
 import "./track.js?v=202611031900";
 import { $, esc, inline, chrome, productCard, productMock, KINDS } from "./ui.js?v=202611031900";
-import { featureHtml, initFeature, openWheel } from "./kothin.js?v=202611032300";
+import { featureHtml, initFeature, openWheel } from "./kothin.js?v=202611032330";
 
 const show = new URLSearchParams(location.search).get("kind") || "";
 
@@ -15,6 +15,7 @@ const BOOKS = [
     cover_url: "assets/img/shop/aaj-charo-cover.jpg",
     pdf: "books/aaj-charo-kal-dhoro-na.pdf",
     spun: "kk-spun-aaj-charo",
+    tag: "যে অভ্যাস আজই ছাড়বে",
   },
 ];
 
@@ -41,7 +42,7 @@ chrome(settings);
 
 // সব ফিল্টারে ফিচার বইটা ওপরে
 $("#feature").innerHTML = featureHtml();
-initFeature();
+initFeature(BOOKS);
 
 const all = [...BOOKS, ...(await listProducts())];
 

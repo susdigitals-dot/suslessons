@@ -359,6 +359,16 @@ p { margin: 0; }
 .pc-btns { margin-top: auto; width: 100%; display: grid; gap: 8px; }
 .pc-btns .btn { margin-top: 0; }
 .kk-btns { display: grid; gap: 10px; justify-items: stretch; }
+/* ভাসমান বোতাম → কোন বইটা নেবেন */
+.kk-picks { display: grid; gap: 12px; margin-top: 18px; }
+.kk-pick { all: unset; box-sizing: border-box; cursor: pointer; display: flex; align-items: center; gap: 14px; padding: 10px 16px 10px 10px; background: var(--paper); border-radius: 18px; box-shadow: inset 0 0 0 1.5px var(--line); text-align: left; transition: box-shadow 0.2s, transform 0.2s; }
+.kk-pick:hover, .kk-pick:focus-visible { box-shadow: inset 0 0 0 2px var(--gold); transform: translateY(-2px); }
+.kk-pick img, .kk-pick-c { flex: none; width: 56px; height: 70px; border-radius: 10px; object-fit: cover; object-position: top; }
+.kk-pick-c { background: var(--maroon); color: var(--gold); display: grid; place-items: center; font: 400 1.7rem/1 var(--display); }
+.kk-pick > span:nth-child(2) { flex: 1; display: grid; gap: 2px; line-height: 1.35; }
+.kk-pick b { color: var(--maroon); font: 400 1.12rem/1.3 var(--display); }
+.kk-pick small { color: var(--muted); font-size: 0.85rem; }
+.kk-pick > span:last-child { color: var(--maroon); font-weight: 700; }
 .trust { list-style: none; padding: 16px 20px; margin: 22px 0; background: var(--paper); border-radius: var(--r); display: grid; gap: 6px; color: var(--teal); font-weight: 600; font-size: 0.95rem; }
 .pc-trust { margin: 18px 0; color: var(--muted); font-size: 0.92rem; }
 .prod-desc { margin-top: 10px; color: var(--ink); font-size: 1.05rem; }
