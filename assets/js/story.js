@@ -1,6 +1,6 @@
-import { getSettings, getStory, getBook, listStories } from "./data.js?v=202611031735";
-import "./track.js?v=202611031735";
-import { $, esc, inline, safeUrl, chrome, renderBody, fmtDate, lawTag, avatar, endCard, bookMock, storyCard, setMeta } from "./ui.js?v=202611031735";
+import { getSettings, getStory, getBook, listStories } from "./data.js?v=202611031824";
+import "./track.js?v=202611031824";
+import { $, esc, inline, safeUrl, chrome, renderBody, fmtDate, lawTag, avatar, endCard, bookMock, storyCard, setMeta } from "./ui.js?v=202611031824";
 
 const slug = new URLSearchParams(location.search).get("s") || "";
 const settings = await getSettings();

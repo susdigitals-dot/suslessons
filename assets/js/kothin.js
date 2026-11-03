@@ -1,7 +1,7 @@
 // দোকানের ফিচার বই — "কঠিন কথা বলার ৫০টা প্রশ্ন"
 // বইয়ের মলাট, উল্টানো যায় এমন প্রশ্ন-কার্ড, আর দাম ঠিক করার চাকা (চাকা সবসময় "ফ্রি"-তে থামে)
-import { $, bn, esc, inline, wordmark } from "./ui.js?v=202611031735";
-import { isIndia } from "./geo.js?v=202611031735";
+import { $, bn, esc, inline, wordmark } from "./ui.js?v=202611031824";
+import { isIndia } from "./geo.js?v=202611031824";
 
 const PDF = "books/kothin-kotha-50-proshno.pdf";
 const SPUN = "kk-spun";
@@ -218,8 +218,12 @@ function result(again) {
       ${isIndia() ? `<a class="kk-cha" href="cha.html"><span>☕</span><span><b>বইটা কাজে লাগলে, দাদাকে এক কাপ চা?</b><small>পুরোপুরি আপনার ইচ্ছে</small></span><span>→</span></a>` : ""}
     </div>
     ${again ? "" : confetti()}`;
-  // ছোট স্ক্রিনে ফলাফলটা চাকার নিচে লুকিয়ে না থাকে
-  out.querySelector(".kk-win").scrollIntoView({ block: "nearest", behavior: again ? "auto" : "smooth" });
+  // চাকা ছোট হয়ে সরে যায়, যাতে ফ্রি থেকে চা অবধি পুরোটা একসাথে দেখা যায়
+  const wheel = dlg.querySelector(".kk-wheel");
+  wheel.classList.add("done");
+  const last = out.querySelector(".kk-cha") || out.querySelector(".kk-win");
+  const show = () => last.scrollIntoView({ block: "end", behavior: again ? "auto" : "smooth" });
+  setTimeout(show, again ? 0 : 650);
 }
 
 // FB/Insta-র ভেতরে: WhatsApp-এ পাঠানো, Chrome-এ খোলা, বা লিংক কপি
