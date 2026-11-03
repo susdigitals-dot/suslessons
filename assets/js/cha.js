@@ -1,10 +1,10 @@
 // চা খাওয়ান — শুধু ভারতের পাঠকদের জন্য (Razorpay পপআপ, order আসে supabase/functions/cha-order থেকে)। বাংলাদেশ বা অন্য দেশ থেকে এলে পাতাটা চা দেখায় না।
 // চায়ের দোকানের মেনু: প্রতিটা জিনিসের দাম বাঁধা, শুধু সংখ্যা বাড়ানো-কমানো যায়, একসাথে কয়েকটা নেওয়া যায়
-import { CONFIG } from "./config.js";
-import { getSettings } from "./data.js";
-import "./track.js";
-import { $, bn, esc, inline, chrome, toast } from "./ui.js";
-import { isIndia } from "./geo.js";
+import { CONFIG } from "./config.js?v=202611031510";
+import { getSettings } from "./data.js?v=202611031510";
+import "./track.js?v=202611031510";
+import { $, bn, esc, inline, chrome, toast } from "./ui.js?v=202611031510";
+import { isIndia } from "./geo.js?v=202611031510";
 
 const settings = await getSettings();
 chrome(settings);

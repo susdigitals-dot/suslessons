@@ -1,6 +1,6 @@
 // ডেটা লেয়ার — Supabase থাকলে সেখান থেকে, না থাকলে seed.js থেকে
-import { CONFIG } from "./config.js";
-import { SEED } from "./seed.js";
+import { CONFIG } from "./config.js?v=202611031510";
+import { SEED } from "./seed.js?v=202611031510";
 
 export const live = Boolean(CONFIG.supabaseUrl && CONFIG.supabaseAnonKey && window.supabase);
 export const sb = live ? window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseAnonKey) : null;

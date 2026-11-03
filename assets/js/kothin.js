@@ -1,7 +1,7 @@
 // দোকানের ফিচার বই — "কঠিন কথা বলার ৫০টা প্রশ্ন"
 // বইয়ের মলাট, উল্টানো যায় এমন প্রশ্ন-কার্ড, আর দাম ঠিক করার চাকা (চাকা সবসময় "ফ্রি"-তে থামে)
-import { $, bn, esc, inline, wordmark } from "./ui.js";
-import { isIndia } from "./geo.js";
+import { $, bn, esc, inline, wordmark } from "./ui.js?v=202611031510";
+import { isIndia } from "./geo.js?v=202611031510";
 
 const PDF = "books/kothin-kotha-50-proshno.pdf";
 const SPUN = "kk-spun";

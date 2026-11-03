@@ -27,3 +27,5 @@ A static site (GitHub Pages) with Supabase as the database and admin backend.
 Until Supabase is connected, the site shows the sample content from `assets/js/seed.js`.
 
 Local preview: `python -m http.server 5500` (from this folder).
+
+Before each push, run `python tools/bump.py`. It stamps a new `?v=` on every CSS/JS link and import, so visitors get the new files right away instead of a cached copy (GitHub Pages lets browsers cache for 10 minutes).
