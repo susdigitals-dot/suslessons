@@ -215,25 +215,24 @@ async function dashboard(days = Number(sessionStorage.getItem("dash-days")) || 7
 // ── গল্পের তালিকা ───────────────────────────
 async function storiesList() {
   main().innerHTML = `<div class="skeleton"></div>`;
-  const { data, error } = await sb.from("stories").select("id,slug,title,type,published,published_at,cover_url,slides").order("published_at", { ascending: false });
+  const { data, error } = await sb.from("stories").select("id,slug,title,type,published,published_at,cover_url").order("published_at", { ascending: false });
   if (error) return fail(error);
   main().innerHTML = `
     <div class="top">
       <h1>গল্প</h1>
       <div class="acts">
-        <button class="btn btn-ghost btn-sm" data-new="slides">+ স্লাইড গল্প</button>
-        <button class="btn btn-maroon btn-sm" data-new="blog">+ নতুন গল্প</button>
+        <button class="btn btn-maroon btn-sm" data-new>+ নতুন গল্প</button>
       </div>
     </div>
     ${data.length ? "" : `<div class="mode-banner">এখনো কোনো গল্প নেই। <button class="btn btn-gold btn-sm" id="importSeed">নমুনা গল্প আর বই ইমপোর্ট করো</button></div>`}
     <div class="table">${data.map((s) => row(s, "story")).join("") || `<p class="empty">খালি</p>`}</div>`;
-  $$("[data-new]").forEach((b) => (b.onclick = () => storyForm({ type: b.dataset.new })));
+  $$("[data-new]").forEach((b) => (b.onclick = () => storyForm({})));
   $("#importSeed")?.addEventListener("click", importSeed);
   bindRows("stories", storyForm);
 }
 
 function row(x, kind) {
-  const img = x.cover_url || x.slides?.[0]?.image;
+  const img = x.cover_url;
   const pub = x.published;
   const view = { story: "../story.html?s=", book: "../book.html?b=", product: "../product.html?p=" }[kind] + encodeURIComponent(x.slug);
   return `
@@ -243,7 +242,7 @@ function row(x, kind) {
         <h3>${esc((x.title || "").replace(/==|\*\*/g, ""))}</h3>
         <div class="sub">
           <span class="status ${pub ? "on" : "off"}">${pub ? "প্রকাশিত" : "খসড়া"}</span>
-          ${kind === "story" ? `<span>${x.type === "slides" ? "স্লাইড" : "লেখা"}</span><span>${esc(x.published_at || "")}</span>`
+          ${kind === "story" ? `${x.type === "slides" ? `<span class="status off">স্লাইড — সাইটে দেখায় না</span>` : ""}<span>${esc(x.published_at || "")}</span>`
             : kind === "product" ? `<span>${esc(KINDS[x.kind] || "")}</span><span>${x.kind === "affiliate" && !x.price ? "affiliate" : price(x.price)}</span>${x.buy_url ? "" : `<span class="status off">কেনার লিংক নেই</span>`}`
             : `<span>${esc(x.author || "")}</span>`}
           <span>/${esc(x.slug)}</span>
@@ -279,23 +278,19 @@ function bindRows(table, form) {
 // ── গল্প এডিটর ───────────────────────────
 async function storyForm(s = {}) {
   const { data: books } = await sb.from("books").select("slug,title").order("sort");
-  const isSlides = s.type === "slides";
   main().innerHTML = `
     <div class="top">
-      <h1>${s.id ? "গল্প এডিট" : isSlides ? "নতুন স্লাইড গল্প" : "নতুন গল্প"}</h1>
+      <h1>${s.id ? "গল্প এডিট" : "নতুন গল্প"}</h1>
       <button class="btn btn-ghost btn-sm" id="back">← তালিকায় ফিরুন</button>
     </div>
     <form class="form" id="f">
       <div class="grid2">
-        <label class="field"><span>ধরন</span>
-          <select name="type"><option value="blog"${!isSlides ? " selected" : ""}>লেখা গল্প</option><option value="slides"${isSlides ? " selected" : ""}>স্লাইড গল্প</option></select>
-        </label>
         <label class="field"><span>Slug (লিংকের নাম, ইংরেজিতে)</span><input type="text" name="slug" value="${esc(s.slug || "")}" placeholder="boro-biye-boro-dhar"><small>ফাঁকা রাখলে নিজে থেকে তৈরি হবে</small></label>
       </div>
       <label class="field"><span>শিরোনাম</span><input type="text" name="title" required value="${esc(s.title || "")}"><small><code>==শব্দ==</code> দিলে কমলা হাইলাইট হয়</small></label>
       <label class="field"><span>ছোট বিবরণ (কার্ডে দেখায়)</span><textarea name="excerpt">${esc(s.excerpt || "")}</textarea></label>
       <label class="field"><span>শেষ লাইন — আসল শিক্ষা</span><input type="text" name="last_line" value="${esc(s.last_line || "")}"><small>মেরুন এন্ড কার্ডে বড় করে দেখায়। ১–৩টা শব্দ <code>==এভাবে==</code> হাইলাইট করো।</small></label>
-      ${uploadField("cover_url", "কভার ছবি", s.cover_url, "covers")}
+      ${uploadField("cover_url", "কভার ছবি (রিল/ভিডিওর স্ক্রিনশট দিও না)", s.cover_url, "covers")}
       <div class="grid2">
         <label class="field"><span>কোন বই থেকে</span>
           <select name="book_slug"><option value="">— কোনোটা না —</option>${(books || []).map((b) => `<option value="${esc(b.slug)}"${b.slug === s.book_slug ? " selected" : ""}>${esc(b.title)}</option>`).join("")}</select>
@@ -304,7 +299,7 @@ async function storyForm(s = {}) {
       </div>
       <label class="field"><span>ট্যাগ (কমা দিয়ে)</span><input type="text" name="tags" value="${esc((s.tags || []).join(", "))}" placeholder="পরিবার, বাবা"></label>
 
-      <div id="blogPart" ${isSlides ? "hidden" : ""}>
+      <div>
         <label class="field"><span>গল্প</span><textarea class="body" name="body">${esc(s.body || "")}</textarea></label>
         <div class="help" style="margin-top:10px">
           <code>## শিরোনাম</code> · <code>@বাবা: “কথা”</code> কথোপকথন · <code>&gt; লাইন</code> গাঢ় কার্ড ·
@@ -313,11 +308,6 @@ async function storyForm(s = {}) {
         </div>
       </div>
 
-      <div id="slidesPart" ${isSlides ? "" : "hidden"}>
-        <div class="field"><span>স্লাইডগুলো</span><small>প্রতিটা স্লাইডে একটা ছবি (৪:৫ বা ৯:১৬) আর এক-দুই লাইন। শেষে মেরুন এন্ড কার্ড নিজে থেকে যোগ হয়।</small></div>
-        <div class="repeat" id="slides">${(s.slides || []).map(slideItem).join("")}</div>
-        <button type="button" class="btn btn-ghost btn-sm add" id="addSlide" style="margin-top:10px">+ স্লাইড যোগ করো</button>
-      </div>
 
       <div class="grid2">
         <label class="field"><span>প্রকাশের তারিখ</span><input type="date" name="published_at" value="${esc(s.published_at || new Date().toISOString().slice(0, 10))}"></label>
@@ -331,18 +321,13 @@ async function storyForm(s = {}) {
 
   const f = $("#f");
   $("#back").onclick = () => go("stories");
-  f.type.onchange = () => {
-    $("#blogPart").hidden = f.type.value !== "blog";
-    $("#slidesPart").hidden = f.type.value !== "slides";
-  };
-  $("#addSlide").onclick = () => $("#slides").insertAdjacentHTML("beforeend", slideItem({}));
   bindForm(f);
 
   f.onsubmit = async (e) => {
     e.preventDefault();
     const v = Object.fromEntries(new FormData(f));
     const rec = {
-      type: v.type,
+      type: "blog",
       title: v.title.trim(),
       slug: slugify(v.slug) || slugify(v.title) || "story-" + Date.now().toString(36),
       excerpt: v.excerpt.trim(),
@@ -352,11 +337,7 @@ async function storyForm(s = {}) {
       law: v.law.trim(),
       tags: v.tags.split(/[,،]/).map((t) => t.trim()).filter(Boolean),
       body: v.body || "",
-      slides: $$("#slides .rep-item").map((el) => ({
-        image: $('[data-k="image"]', el).value.trim(),
-        speaker: $('[data-k="speaker"]', el).value.trim(),
-        text: $('[data-k="text"]', el).value.trim(),
-      })).filter((x) => x.text || x.image),
+      slides: [],
       published: !!v.published,
       published_at: v.published_at || null,
     };
@@ -364,16 +345,6 @@ async function storyForm(s = {}) {
   };
 }
 
-function slideItem(sl = {}) {
-  return `
-    <div class="rep-item slide-item">
-      <img src="${esc(src(sl.image || ""))}" alt="" ${sl.image ? "" : 'style="visibility:hidden"'}>
-      <div class="upload"><input type="text" data-k="image" value="${esc(sl.image || "")}" placeholder="ছবির লিংক" class="input"><label class="btn btn-ghost btn-sm">⬆ আপলোড<input type="file" accept="image/*" data-up="slides"></label></div>
-      <button type="button" class="x" data-remove aria-label="স্লাইড মুছুন">✕</button>
-      <input type="text" data-k="speaker" value="${esc(sl.speaker || "")}" placeholder="বক্তা (যেমন: বাবা) — না থাকলে ফাঁকা" class="input full">
-      <textarea data-k="text" placeholder="স্লাইডের লেখা — ==হাইলাইট==" class="input full" rows="2">${esc(sl.text || "")}</textarea>
-    </div>`;
-}
 
 // ── বইয়ের তালিকা ───────────────────────────
 async function booksList() {

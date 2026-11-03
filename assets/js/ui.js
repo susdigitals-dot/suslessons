@@ -67,7 +67,6 @@ export function root() {
 const NAV = [
   ["index.html", "হোম"],
   ["stories.html", "গল্প"],
-  ["stories.html?type=slides", "স্লাইড গল্প"],
   ["books.html", "বই"],
   ["shop.html", "দোকান"],
 ];
@@ -83,7 +82,6 @@ const LEGAL = [
 
 export function chrome(settings) {
   const here = location.pathname.split("/").pop() || "index.html";
-  const qs = location.search;
   const header = $("#site-header");
   if (header) {
     header.innerHTML = `
@@ -91,11 +89,7 @@ export function chrome(settings) {
         <a class="brand" href="index.html" aria-label="sus.lessons হোম">${avatar(40)}${wordmark()}</a>
         <button class="menu-btn" aria-label="মেনু" aria-expanded="false"><span></span><span></span></button>
         <nav class="nav">
-          ${NAV.map(([href, label]) => {
-            const [p, s] = href.split("?");
-            const on = p === here && (s ? qs.includes(s) : !qs.includes("type=slides"));
-            return `<a href="${href}"${on ? ' aria-current="page"' : ""}>${label}</a>`;
-          }).join("")}
+          ${NAV.map(([href, label]) => `<a href="${href}"${href === here ? ' aria-current="page"' : ""}>${label}</a>`).join("")}
           <a class="pill pill-maroon nav-follow" href="${safeUrl(settings.instagram)}" target="_blank" rel="noopener">ফলো করুন</a>
         </nav>
       </div>`;
@@ -139,7 +133,6 @@ export function storyCard(s) {
     <article class="story-card">
       <a href="${href}" class="sc-media">
         ${s.cover_url ? `<img src="${safeUrl(s.cover_url)}" alt="" loading="lazy">` : `<div class="sc-blank">${wordmark()}</div>`}
-        ${s.type === "slides" ? `<span class="sc-kind">স্লাইড · ${bn((s.slides || []).length + 1)}</span>` : ""}
       </a>
       <div class="sc-body">
         <div class="sc-meta">${lawTag(s.law)}${(s.tags || []).slice(0, 2).map((t) => `<span class="chip">${esc(t)}</span>`).join("")}</div>
@@ -150,16 +143,6 @@ export function storyCard(s) {
     </article>`;
 }
 
-export function slideCard(s) {
-  const first = (s.slides || [])[0] || {};
-  return `
-    <a class="slide-card" href="story.html?s=${encodeURIComponent(s.slug)}">
-      ${s.cover_url || first.image ? `<img src="${safeUrl(s.cover_url || first.image)}" alt="" loading="lazy">` : ""}
-      <span class="slide-card-pill">${wordmark()}</span>
-      <span class="slide-card-text">${inline(s.title)}</span>
-      <span class="slide-card-count">${bn((s.slides || []).length + 1)} স্লাইড ›</span>
-    </a>`;
-}
 
 // আমাদের নিজের মেরুন বইয়ের মলাট (প্রকাশকের মলাট নয়)
 export function bookMock(b, size = "") {

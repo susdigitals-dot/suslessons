@@ -1,20 +1,15 @@
 import { getSettings, listStories, listBooks } from "./data.js";
 import "./track.js";
-import { $, inline, esc, safeUrl, chrome, storyCard, slideCard, bookCard, bookMock, endCard, lawTag } from "./ui.js";
+import { $, inline, esc, safeUrl, chrome, storyCard, bookCard, bookMock, endCard, lawTag } from "./ui.js";
 
 const settings = await getSettings();
 chrome(settings);
 
 $("#heroTitle").innerHTML = inline(settings.tagline).replace(/(শেষ লাইনেই<\/mark>)\s*/, "$1<br>");
 $("#heroIntro").textContent = settings.intro;
-const [blogs, slides, books] = await Promise.all([
-  listStories({ type: "blog", limit: 6 }),
-  listStories({ type: "slides", limit: 10 }),
-  listBooks(),
-]);
+const [blogs, books] = await Promise.all([listStories({ limit: 6 }), listBooks()]);
 
 $("#latest").innerHTML = blogs.length ? blogs.map(storyCard).join("") : `<p class="empty">শীঘ্রই নতুন গল্প আসছে।</p>`;
-$("#slidesRail").innerHTML = slides.map(slideCard).join("") || `<p class="empty">শীঘ্রই আসছে।</p>`;
 $("#shelf").innerHTML = books.slice(0, 4).map(bookCard).join("");
 
 // আজকের বই — featured বই, না থাকলে প্রথমটা

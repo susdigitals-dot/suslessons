@@ -7,6 +7,18 @@ export const sb = live ? window.supabase.createClient(CONFIG.supabaseUrl, CONFIG
 
 const byDate = (a, b) => String(b.published_at || "").localeCompare(String(a.published_at || ""));
 
+// রিল/ভিডিওর স্ক্রিনশট সাইটে দেখানো হয় না — পুরোনো লেখায় থাকলেও বাদ
+const isVideoShot = (u = "") => /assets\/img\/(scene|thumb)-\d+\.jpg/i.test(u);
+const clean = (s) =>
+  s && {
+    ...s,
+    cover_url: isVideoShot(s.cover_url) ? "" : s.cover_url,
+    body: String(s.body || "")
+      .split(/\n\s*\n/)
+      .filter((b) => !(/^!\[.*?\]\((.+?)\)$/.test(b.trim()) && isVideoShot(b)))
+      .join("\n\n"),
+  };
+
 async function q(run, fallback) {
   if (!live) return fallback();
   try {
@@ -19,29 +31,30 @@ async function q(run, fallback) {
   }
 }
 
-export function listStories({ type, limit, bookSlug } = {}) {
-  return q(
+// শুধু লেখা গল্প — স্লাইড গল্প সাইট থেকে সরানো হয়েছে
+export async function listStories({ limit, bookSlug } = {}) {
+  const rows = await q(
     () => {
-      let r = sb.from("stories").select("*").eq("published", true).order("published_at", { ascending: false });
-      if (type) r = r.eq("type", type);
+      let r = sb.from("stories").select("*").eq("published", true).eq("type", "blog").order("published_at", { ascending: false });
       if (bookSlug) r = r.eq("book_slug", bookSlug);
       if (limit) r = r.limit(limit);
       return r;
     },
     () => {
-      let s = SEED.stories.filter((x) => x.published).sort(byDate);
-      if (type) s = s.filter((x) => x.type === type);
+      let s = SEED.stories.filter((x) => x.published && x.type === "blog").sort(byDate);
       if (bookSlug) s = s.filter((x) => x.book_slug === bookSlug);
       return limit ? s.slice(0, limit) : s;
     }
   );
+  return (rows || []).map(clean);
 }
 
-export function getStory(slug) {
-  return q(
-    () => sb.from("stories").select("*").eq("slug", slug).eq("published", true).maybeSingle(),
-    () => SEED.stories.find((x) => x.slug === slug && x.published) || null
+export async function getStory(slug) {
+  const row = await q(
+    () => sb.from("stories").select("*").eq("slug", slug).eq("published", true).eq("type", "blog").maybeSingle(),
+    () => SEED.stories.find((x) => x.slug === slug && x.published && x.type === "blog") || null
   );
+  return clean(row);
 }
 
 export function listBooks({ featured, free } = {}) {

@@ -59,7 +59,7 @@ if (enabled) {
       const a = e.target.closest?.("a[href]");
       if (!a) return;
       // কার্ডের পুরো লেখা না নিয়ে শুধু শিরোনামটা নাও
-      const title = a.querySelector(".bm-title, .slide-card-text, h1, h2, h3");
+      const title = a.querySelector(".bm-title, h1, h2, h3");
       const text = (a.getAttribute("aria-label") || title?.textContent || a.querySelector("img[alt]")?.alt || a.textContent || "")
         .replace(/\s+/g, " ").trim();
       const label = text || (a.hasAttribute("download") ? "⬇ ডাউনলোড" : a.href.split("/").pop());
