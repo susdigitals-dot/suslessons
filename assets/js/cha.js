@@ -1,4 +1,5 @@
-// চা খাওয়ান — শুধু ভারতের পাঠকদের জন্য (UPI)। বাংলাদেশ বা অন্য দেশ থেকে এলে পাতাটা চা দেখায় না।
+// চা খাওয়ান — শুধু ভারতের পাঠকদের জন্য (Razorpay পপআপ)। বাংলাদেশ বা অন্য দেশ থেকে এলে পাতাটা চা দেখায় না।
+import { CONFIG } from "./config.js";
 import { getSettings } from "./data.js";
 import "./track.js";
 import { $, bn, esc, inline, chrome, toast } from "./ui.js";
@@ -32,7 +33,6 @@ if (!isIndia()) {
 }
 
 function render() {
-  const upi = sp.upi || "";
   main.innerHTML = `
     <section class="cha">
       <div class="cha-art" aria-hidden="true">
@@ -57,71 +57,79 @@ function render() {
               <b>₹${bn(c.amt)}</b><span>${c.name}</span><small>${c.sub}</small>
             </button>`).join("")}
         </div>
-        <label class="cha-own"><span>নিজের মতো</span><span class="cha-rs">₹</span><input type="number" inputmode="numeric" min="1" max="10000" placeholder="যত খুশি" id="own"></label>
-        <div class="cha-pay" id="pay"></div>
+        <form class="cha-own" id="ownForm"><span>নিজের মতো</span><span class="cha-rs">₹</span><input type="number" inputmode="numeric" min="1" max="10000" placeholder="যত খুশি" id="own" aria-label="নিজের মতো টাকা"><button class="btn-mini" type="submit" id="ownGo">খাওয়ান</button></form>
+        <div class="cha-pay" id="pay" aria-live="polite"></div>
         <p class="cha-note">চা খাওয়ানো পুরোপুরি আপনার ইচ্ছে — না খাওয়ালেও বই, গল্প সব একই থাকবে। ❤️<br>এটা দান, কোনো কেনাকাটা নয়; তাই রিফান্ড হয় না।</p>
       </div>
     </section>`;
 
-  let amt = CUPS.find((c) => c.pick).amt;
   const pay = $("#pay");
   const own = $("#own");
   const opts = [...main.querySelectorAll(".cha-opt")];
-
   const fillCup = (f) => main.style.setProperty("--fill", f);
+  const pick = (o) => opts.forEach((x) => x.setAttribute("aria-checked", x === o));
 
-  function draw() {
-    if (!upi) {
-      pay.innerHTML = `<p class="cha-soon">UPI খুব শীঘ্রই চালু হচ্ছে। ততক্ষণ <a href="contact.html">একটা মেসেজ</a> পাঠালেও চলবে — সেটাই অনেক।</p>`;
-      return;
-    }
-    const link = `upi://pay?pa=${encodeURIComponent(upi)}&pn=${encodeURIComponent(sp.upiName || "sus.lessons")}&am=${amt}&cu=INR&tn=${encodeURIComponent("এক কাপ চা")}`;
-    let qr = "";
-    if (window.qrcode) {
-      const q = window.qrcode(0, "M");
-      q.addData(link);
-      q.make();
-      qr = q.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
-    }
-    pay.innerHTML = `
-      <a class="btn btn-maroon cha-go" href="${esc(link)}">☕ ₹${bn(amt)}-এর চা খাওয়ান — UPI অ্যাপে খুলুন</a>
-      <div class="cha-alt">
-        ${qr ? `<div class="cha-qr" aria-label="UPI QR কোড">${qr}<small>ফোনের যেকোনো UPI অ্যাপে স্ক্যান করুন</small></div>` : ""}
-        <div class="pay-row"><span>UPI</span><code>${esc(upi)}</code><button class="btn-mini" type="button" data-copy="${esc(upi)}">কপি</button></div>
-      </div>`;
-  }
-
-  main.addEventListener("click", async (e) => {
+  // কাপে চাপ দিলেই সেই টাকার পেমেন্ট পপআপ
+  main.addEventListener("click", (e) => {
     const o = e.target.closest(".cha-opt");
-    if (o) {
-      opts.forEach((x) => x.setAttribute("aria-checked", x === o));
-      own.value = "";
-      amt = Number(o.dataset.amt);
-      fillCup(o.dataset.fill);
-      draw();
-    }
-    const c = e.target.closest("[data-copy]");
-    if (c) {
-      try {
-        await navigator.clipboard.writeText(c.dataset.copy);
-        toast("কপি হয়েছে ✓");
-      } catch {
-        toast("কপি হলো না — হাতে লিখে নিন");
-      }
-    }
+    if (!o) return;
+    pick(o);
+    own.value = "";
+    fillCup(o.dataset.fill);
+    checkout(Number(o.dataset.amt));
   });
 
   own.addEventListener("input", () => {
-    const n = Math.min(10000, Math.max(0, Math.round(Number(own.value) || 0)));
-    if (!n) return;
-    opts.forEach((x) => x.setAttribute("aria-checked", "false"));
-    amt = n;
-    fillCup(Math.min(1, 0.3 + n / 150));
-    draw();
+    const n = Math.round(Number(own.value) || 0);
+    if (n > 0) {
+      pick(null);
+      fillCup(Math.min(1, 0.3 + n / 150));
+    }
+  });
+
+  $("#ownForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const n = Math.round(Number(own.value) || 0);
+    if (n < 1 || n > 10000) {
+      toast("₹১ থেকে ₹১০,০০০-এর মধ্যে লিখুন");
+      own.focus();
+      return;
+    }
+    checkout(n);
   });
 
   fillCup(CUPS.find((c) => c.pick).fill);
-  // QR লাইব্রেরি defer-এ আসে — এলে আবার আঁকো
-  draw();
-  if (!window.qrcode) window.addEventListener("load", draw, { once: true });
+
+  function checkout(amt) {
+    // Key ID না থাকলে Razorpay.me লিংক — সেখানে পাঠক নিজে অঙ্কটা লেখেন
+    if (!CONFIG.razorpayKey || !window.Razorpay) {
+      if (!CONFIG.razorpayMe) return toast("পেমেন্ট এখনো চালু হয়নি");
+      toast(`Razorpay-তে ₹${bn(amt)} লিখে পেমেন্ট করুন`);
+      window.open(CONFIG.razorpayMe, "_blank", "noopener");
+      return;
+    }
+    const rzp = new window.Razorpay({
+      key: CONFIG.razorpayKey,
+      amount: amt * 100, // পয়সায়
+      currency: "INR",
+      name: "sus.lessons",
+      description: amt >= 100 ? "আড্ডার চা" : amt >= 50 ? "চা আর বিস্কুট" : "এক কাপ চা",
+      image: `${CONFIG.siteUrl}/assets/brand/avatar.jpg`,
+      notes: { purpose: "cha", page: location.pathname },
+      theme: { color: "#3e2228" },
+      handler: (r) => thanks(amt, r.razorpay_payment_id),
+    });
+    rzp.on("payment.failed", () => toast("পেমেন্ট হলো না — আবার চেষ্টা করুন"));
+    rzp.open();
+  }
+
+  function thanks(amt, id) {
+    pay.innerHTML = `
+      <div class="cha-thanks">
+        <b>চা পেয়ে গেছি — ধন্যবাদ! ☕</b>
+        <p>₹${bn(amt)}-এর চা পৌঁছেছে। পরের গল্পটা আপনার জন্য একটু তাড়াতাড়ি আসবে।</p>
+        ${id ? `<small>পেমেন্ট আইডি: ${esc(id)}</small>` : ""}
+      </div>`;
+    toast("ধন্যবাদ! ❤️");
+  }
 }

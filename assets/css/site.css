@@ -621,16 +621,13 @@ button.nav-follow { font-size: 0.95rem; }
 .cha-opt:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
 .cha-own { display: flex; align-items: center; gap: 8px; margin: 12px 0 20px; background: var(--paper); border-radius: 16px; padding: 6px 8px 6px 16px; box-shadow: inset 0 0 0 1.5px var(--line); }
 .cha-own > span:first-child { color: var(--muted); font-weight: 600; font-size: 0.92rem; white-space: nowrap; }
-.cha-rs { margin-left: auto; color: var(--maroon); font-weight: 700; }
-.cha-own input { width: 120px; border: 0; background: var(--cream); border-radius: 12px; padding: 10px 12px; font: 700 1.05rem var(--text); color: var(--maroon); }
-.cha-pay { display: grid; gap: 14px; }
-.cha-go { justify-content: center; padding: 15px 20px; font-size: 1.02rem; }
-.cha-alt { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; }
-.cha-qr { background: #fff; padding: 8px; border-radius: 14px; width: 150px; text-align: center; }
-.cha-qr svg { width: 100%; height: auto; display: block; }
-.cha-qr small { font-size: 0.68rem; color: var(--muted); line-height: 1.3; display: block; margin-top: 4px; }
-.cha-soon { background: var(--paper); border-radius: 16px; padding: 16px 18px; color: var(--muted); }
-.cha-soon a { color: var(--maroon); }
+.cha-rs { color: var(--maroon); font-weight: 700; }
+.cha-own input { flex: 1; min-width: 0; border: 0; background: var(--cream); border-radius: 12px; padding: 10px 12px; font: 700 1.05rem var(--text); color: var(--maroon); }
+.cha-own .btn-mini { padding: 11px 16px; }
+.cha-pay:empty { display: none; }
+.cha-thanks { background: var(--teal); color: var(--paper); border-radius: 18px; padding: 18px 20px; display: grid; gap: 4px; }
+.cha-thanks b { font: 400 1.3rem/1.3 var(--display); }
+.cha-thanks small { opacity: 0.7; font-size: 0.78rem; overflow-wrap: anywhere; }
 .cha-note { margin-top: 20px; font-size: 0.86rem; color: var(--muted); }
 .cha-off { text-align: center; max-width: 560px; margin: 0 auto; padding: 80px 0 40px; }
 .cha-off h1 { font-size: clamp(2rem, 4.6vw, 2.8rem); }
@@ -644,7 +641,4 @@ button.nav-follow { font-size: 0.95rem; }
   .cha-cups { grid-template-columns: 1fr; }
   .cha-opt { flex-direction: row; flex-wrap: wrap; align-items: baseline; column-gap: 10px; text-align: left; }
   .cha-opt small { flex-basis: 100%; }
-  .cha-alt { grid-template-columns: 1fr; justify-items: center; }
-  .cha-alt .pay-row { width: 100%; }
 }
-@media (hover: none) { .cha-qr { display: none; } .cha-alt { grid-template-columns: 1fr; } }

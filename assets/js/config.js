@@ -13,4 +13,9 @@ export const CONFIG = {
 
   siteUrl: "https://suslessons.in",
   mediaBucket: "media",
+
+  // চা খাওয়ান (cha.html) — Razorpay Dashboard → Account & Settings → API Keys → Key ID
+  // শুধু Key ID (rzp_live_…) বসাও, Key Secret কখনো এখানে নয়। ফাঁকা থাকলে razorpayMe লিংক খোলে।
+  razorpayKey: "rzp_live_TvdsfUyB9c5TdK",
+  razorpayMe: "https://razorpay.me/@suslessons",
 };
