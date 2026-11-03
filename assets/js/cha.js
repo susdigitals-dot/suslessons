@@ -40,7 +40,7 @@ function render() {
     <section class="cha">
       <div class="cha-head">
         <span class="eyebrow">চায়ের দোকান</span>
-        <h1>${esc(sp.title || "দাদাকে এক কাপ চা খাওয়ান")}</h1>
+        <h1>${esc(sp.title || "ভাইকে এক কাপ চা খাওয়ান")}</h1>
         <p class="cha-lead">${inline("বই আর গল্প ==সবার জন্য ফ্রি।== ভালো লাগলে দোকান থেকে কিছু একটা খাওয়ান — পরের গল্পটা হয়তো একটু তাড়াতাড়ি আসবে।")}</p>
       </div>
       <div class="cha-menu">
@@ -48,7 +48,7 @@ function render() {
           <article class="cha-item" data-id="${m.id}">
             <div class="cha-pic">
               <img src="${m.img}" alt="${esc(m.name)}" width="480" height="480" loading="lazy">
-              ${m.fav ? `<span class="cha-fav">❤ দাদার প্রিয়</span>` : ""}
+              ${m.fav ? `<span class="cha-fav">❤ ভাইয়ের প্রিয়</span>` : ""}
             </div>
             <div class="cha-info">
               <h2>${esc(m.name)}</h2>
@@ -66,7 +66,7 @@ function render() {
       </div>
       <div class="cha-msg">
         <label for="chaNote"><b>চায়ের সাথে দু'কথা</b> <small>ইচ্ছে হলে লিখুন</small></label>
-        <textarea id="chaNote" rows="3" maxlength="500" placeholder="মনের কথা, আমাদের গল্প কেমন লাগে, বা নিজের সম্পর্কে একটু… শুধু দাদা পড়বে।"></textarea>
+        <textarea id="chaNote" rows="3" maxlength="500" placeholder="মনের কথা, আমাদের গল্প কেমন লাগে, বা নিজের সম্পর্কে একটু… শুধু ভাই পড়বে।"></textarea>
         <input id="chaName" maxlength="60" autocomplete="name" placeholder="আপনার নাম (না দিলেও চলবে)">
       </div>
       <div class="cha-bar">
@@ -74,7 +74,7 @@ function render() {
         <button class="btn btn-maroon" type="button" id="payGo">খাওয়ান ☕</button>
       </div>
       <div class="cha-pay" id="pay" aria-live="polite"></div>
-      <p class="cha-note">খাওয়ানো পুরোপুরি আপনার ইচ্ছে — না খাওয়ালেও বই, গল্প সব একই থাকবে। ❤️<br>এটা দান, কোনো কেনাকাটা নয়; তাই রিফান্ড হয় না।</p>
+      <p class="cha-note">খাওয়ানো পুরোপুরি আপনার ইচ্ছে — না খাওয়ালেও বই, গল্প সব একই থাকবে। ❤️</p>
     </section>`;
 
   const pay = $("#pay");

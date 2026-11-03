@@ -214,7 +214,7 @@ function result(again) {
       <span class="kk-stamp">ফ্রি!</span>
       <p><b>${again ? "আপনার চাকা ফ্রি-তেই থেমেছিলো।" : "চাকা থামলো ফ্রি-তে!"}</b><br>বইটা আপনার — একটা টাকাও লাগবে না।</p>
       ${INAPP ? inappHtml() : `<a class="btn btn-gold" href="${PDF}" download>⬇ বইটা নামিয়ে নিন (PDF)</a>`}
-      ${isIndia() ? `<a class="kk-cha" href="cha.html"><span>☕</span><span><b>বইটা কাজে লাগলে, দাদাকে এক কাপ চা?</b><small>পুরোপুরি আপনার ইচ্ছে</small></span><span>→</span></a>` : ""}
+      ${isIndia() ? `<a class="kk-cha" href="cha.html"><span>☕</span><span><b>বইটা কাজে লাগলে, ভাইকে এক কাপ চা?</b><small>পুরোপুরি আপনার ইচ্ছে</small></span><span>→</span></a>` : ""}
     </div>
     ${again ? "" : confetti()}`;
   // চাকা ছোট হয়ে সরে যায়, যাতে ফ্রি থেকে চা অবধি পুরোটা একসাথে দেখা যায়

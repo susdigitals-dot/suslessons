@@ -24,7 +24,7 @@ export const SEED = {
     followers: "৩০ হাজার+",
     support: {
       enabled: true,
-      title: "দাদাকে এক কাপ চা খাওয়ান",
+      title: "ভাইকে এক কাপ চা খাওয়ান",
       text: "বই বিনামূল্যে। ভালো লাগলে এক কাপ চা খাওয়াতে পারেন — পরের গল্পটা হয়তো একটু তাড়াতাড়ি আসবে।",
       upi: "",
       upiName: "sus.lessons",
