@@ -7,7 +7,7 @@ const PDF = "books/kothin-kotha-50-proshno.pdf";
 const SPUN = "kk-spun";
 
 // Facebook / Instagram-এর ভেতরের ব্রাউজারে PDF নামানো যায় না (?inapp দিয়ে পরীক্ষা করা যায়)
-const INAPP = /FBAN|FBAV|FB_IAB|FBIOS|Instagram|Messenger|Threads|; wv\)/i.test(navigator.userAgent) || /[?&]inapp\b/.test(location.search);
+export const INAPP = /FBAN|FBAV|FB_IAB|FBIOS|Instagram|Messenger|Threads|; wv\)/i.test(navigator.userAgent) || /[?&]inapp\b/.test(location.search);
 
 // গাইডের প্রতিটা অধ্যায়ের প্রথম পরিস্থিতি — ওরা কী বলে, আমরা কী বলি না, কী জিজ্ঞেস করি
 const CARDS = [
