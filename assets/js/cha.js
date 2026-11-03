@@ -1,10 +1,10 @@
 // চা খাওয়ান — শুধু ভারতের পাঠকদের জন্য (Razorpay পপআপ, order আসে supabase/functions/cha-order থেকে)। বাংলাদেশ বা অন্য দেশ থেকে এলে পাতাটা চা দেখায় না।
 // চায়ের দোকানের মেনু: প্রতিটা জিনিসের দাম বাঁধা, শুধু সংখ্যা বাড়ানো-কমানো যায়, একসাথে কয়েকটা নেওয়া যায়
-import { CONFIG } from "./config.js?v=202611031627";
-import { getSettings } from "./data.js?v=202611031627";
-import "./track.js?v=202611031627";
-import { $, bn, esc, inline, chrome, toast } from "./ui.js?v=202611031627";
-import { isIndia } from "./geo.js?v=202611031627";
+import { CONFIG } from "./config.js?v=202611031731";
+import { getSettings, sendMessage } from "./data.js?v=202611031731";
+import "./track.js?v=202611031731";
+import { $, bn, esc, inline, chrome, toast } from "./ui.js?v=202611031731";
+import { isIndia } from "./geo.js?v=202611031731";
 
 const settings = await getSettings();
 chrome(settings);
@@ -63,6 +63,11 @@ function render() {
               </div>
             </div>
           </article>`).join("")}
+      </div>
+      <div class="cha-msg">
+        <label for="chaNote"><b>চায়ের সাথে দু'কথা</b> <small>ইচ্ছে হলে লিখুন</small></label>
+        <textarea id="chaNote" rows="3" maxlength="500" placeholder="মনের কথা, আমাদের গল্প কেমন লাগে, বা নিজের সম্পর্কে একটু… শুধু দাদা পড়বে।"></textarea>
+        <input id="chaName" maxlength="60" autocomplete="name" placeholder="আপনার নাম (না দিলেও চলবে)">
       </div>
       <div class="cha-bar">
         <div class="cha-sum"><small id="sumItems"></small><b id="sumTotal"></b></div>
@@ -135,6 +140,8 @@ function render() {
     const orderId = await makeOrder(amt);
     busy = false;
     const items = summary();
+    const note = $("#chaNote").value.trim();
+    const name = $("#chaName").value.trim();
     const rzp = new window.Razorpay({
       key: CONFIG.razorpayKey,
       ...(orderId ? { order_id: orderId } : {}),
@@ -143,18 +150,24 @@ function render() {
       name: "sus.lessons",
       description: items.slice(0, 250),
       image: `${CONFIG.siteUrl}/assets/brand/avatar.jpg`,
-      notes: { purpose: "cha", items: items.slice(0, 250) },
+      notes: { purpose: "cha", items: items.slice(0, 250), ...(name ? { name } : {}), ...(note ? { message: note.slice(0, 250) } : {}) },
+      ...(name ? { prefill: { name } } : {}),
       theme: { color: "#3e2228" },
-      handler: (r) => thanks(amt, items, r.razorpay_payment_id),
+      handler: (r) => {
+        thanks(amt, items, r.razorpay_payment_id, name);
+        // লেখা থাকলে admin → মেসেজ-এ পৌঁছায়, পেমেন্ট আইডি সহ
+        if (note) sendMessage({ name: name || "নাম না জানানো পাঠক", contact: r.razorpay_payment_id || "razorpay", topic: "☕ চায়ের সাথে", body: `${note}\n\n— ${items} (₹${amt})` });
+      },
     });
     rzp.on("payment.failed", () => toast("পেমেন্ট হলো না — আবার চেষ্টা করুন"));
     rzp.open();
   }
 
-  function thanks(amt, items, id) {
+  function thanks(amt, items, id, name) {
+    $(".cha-msg").hidden = true;
     pay.innerHTML = `
       <div class="cha-thanks">
-        <b>পেয়ে গেছি — ধন্যবাদ! ☕</b>
+        <b>পেয়ে গেছি — ধন্যবাদ${name ? `, ${esc(name)}` : ""}! ☕</b>
         <p>${esc(items)} (₹${bn(amt)}) পৌঁছেছে। পরের গল্পটা আপনার জন্য একটু তাড়াতাড়ি আসবে।</p>
         ${id ? `<small>পেমেন্ট আইডি: ${esc(id)}</small>` : ""}
       </div>`;
