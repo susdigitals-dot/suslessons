@@ -58,9 +58,6 @@ export function featureHtml() {
             <li><b>${bn(138)}</b><span>পাতা</span></li>
             <li><b>📱</b><span>মোবাইলে পড়ার মতো</span></li>
           </ul>
-          <p class="kk-price"><span>দাম কত?</span> <b>₹৯ · ₹১৫ · ₹২১</b> <em>— নাকি ফ্রি?</em></p>
-          <button class="btn btn-maroon kk-cta" type="button" data-spin>🎡 চাকা ঘুরিয়ে দাম ঠিক করুন</button>
-          <p class="kk-small">একবার ঘোরান — চাকা যেখানে থামবে, বই সেই দামে।</p>
         </div>
       </div>
       <div class="kk-deck">
@@ -95,8 +92,15 @@ export function initFeature() {
       const on = card.classList.toggle("on");
       card.setAttribute("aria-pressed", on);
     }
-    if (e.target.closest("[data-spin]")) openWheel();
   });
+
+  // সবসময় ভেসে থাকা বোতাম — দাম বা চাকার কথা নয়, শুধু একটা চমক
+  const fab = document.createElement("button");
+  fab.type = "button";
+  fab.className = "kk-fab";
+  fab.innerHTML = `<span class="kk-fab-ico" aria-hidden="true">🎁</span><span>আপনার জন্য একটা <b>চমক</b> রাখা আছে</span>`;
+  fab.addEventListener("click", openWheel);
+  document.body.appendChild(fab);
 
   // ইনস্টাগ্রাম থেকে সোজা চাকায়: shop.html#spin
   if (location.hash === "#spin") openWheel();

@@ -517,12 +517,6 @@ button.nav-follow { font-size: 0.95rem; }
 .kk-stats li { background: var(--cream); border-radius: 16px; padding: 10px 16px; display: flex; flex-direction: column; line-height: 1.2; min-width: 84px; }
 .kk-stats b { font: 700 1.4rem/1.1 var(--text); color: var(--maroon); }
 .kk-stats span { font-size: 0.82rem; color: var(--muted); }
-.kk-price { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin-bottom: 14px; }
-.kk-price span { color: var(--muted); }
-.kk-price b { font: 700 1.3rem/1.2 var(--text); color: var(--maroon); }
-.kk-price em { font-style: normal; color: var(--orange); font-weight: 700; }
-.kk-cta { font-size: 1.05rem; padding: 14px 24px; }
-.kk-small { margin-top: 10px; font-size: 0.88rem; color: var(--muted); }
 
 /* রাগের লাইন → প্রশ্ন কার্ড */
 .kk-deck { margin-top: clamp(30px, 5vw, 48px); border-top: 1px dashed var(--line); padding-top: 26px; }
@@ -554,12 +548,29 @@ button.nav-follow { font-size: 0.95rem; }
   .kk-c-title { font-size: 1.1rem; }
   .kk-c-sub { display: none; }
   .kk-hook { margin-inline: auto; }
-  .kk-stats, .kk-price { justify-content: center; }
-  .kk-cta { width: 100%; justify-content: center; }
+  .kk-stats { justify-content: center; }
 }
 @media (max-width: 520px) {
   .kk-cards { grid-template-columns: 1fr; }
   .kk-card { min-height: 190px; }
+}
+
+/* ভেসে থাকা চমকের বোতাম → চাকার পপআপ */
+.kk-fab {
+  position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; align-items: center; gap: 10px;
+  border: 0; cursor: pointer; background: var(--maroon); color: var(--paper); font: 600 0.98rem/1.25 var(--text);
+  padding: 10px 20px 10px 10px; border-radius: 99px; box-shadow: 0 0 0 2px var(--gold), 0 18px 34px -14px rgba(42, 20, 24, 0.8);
+  animation: fab-in 0.6s 0.8s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+.kk-fab b { color: var(--gold); font-weight: 700; }
+.kk-fab-ico { width: 40px; height: 40px; border-radius: 50%; background: var(--gold); display: grid; place-items: center; font-size: 1.3rem; animation: wiggle 3.2s 2s ease-in-out infinite; }
+.kk-fab:hover .kk-fab-ico { animation-duration: 0.8s; }
+.kk-fab:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+@keyframes fab-in { from { opacity: 0; transform: translateY(30px) scale(0.9); } }
+@keyframes wiggle { 0%, 70%, 100% { transform: rotate(0); } 76% { transform: rotate(-14deg) scale(1.08); } 82% { transform: rotate(12deg) scale(1.08); } 88% { transform: rotate(-8deg); } 94% { transform: rotate(4deg); } }
+@media (max-width: 600px) {
+  .kk-fab { left: 16px; right: 16px; bottom: 14px; justify-content: center; font-size: 0.95rem; }
+  body:has(.kk-fab) #site-footer { padding-bottom: 100px; }
 }
 
 /* চাকার পপআপ */
