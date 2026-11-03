@@ -1,7 +1,7 @@
 // ভিজিট আর লিংক ক্লিক গোনা + লাইভ ভিজিটর (admin → ড্যাশবোর্ড-এ দেখা যায়)
 // কোনো IP বা ব্যক্তিগত তথ্য রাখা হয় না — শুধু পেজ, লিংক আর একটা র‍্যান্ডম সেশন আইডি।
-import { CONFIG } from "./config.js?v=202611031842";
-import { live, sb } from "./data.js?v=202611031842";
+import { CONFIG } from "./config.js?v=202611031900";
+import { live, sb } from "./data.js?v=202611031900";
 
 const store = (k, v) => {
   try {

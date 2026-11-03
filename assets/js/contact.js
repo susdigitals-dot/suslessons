@@ -1,6 +1,6 @@
-import { getSettings, sendMessage } from "./data.js?v=202611031842";
-import "./track.js?v=202611031842";
-import { $, esc, chrome, contactWays, toast } from "./ui.js?v=202611031842";
+import { getSettings, sendMessage } from "./data.js?v=202611031900";
+import "./track.js?v=202611031900";
+import { $, esc, chrome, contactWays, toast } from "./ui.js?v=202611031900";
 
 const settings = await getSettings();
 chrome(settings);

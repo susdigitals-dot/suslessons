@@ -1,7 +1,7 @@
 // দোকানের ফিচার বই — "কঠিন কথা বলার ৫০টা প্রশ্ন"
 // বইয়ের মলাট, উল্টানো যায় এমন প্রশ্ন-কার্ড, আর দাম ঠিক করার চাকা (চাকা সবসময় "ফ্রি"-তে থামে)
-import { $, bn, esc, inline, wordmark } from "./ui.js?v=202611031842";
-import { isIndia } from "./geo.js?v=202611031842";
+import { $, bn, esc, inline, wordmark } from "./ui.js?v=202611031900";
+import { isIndia } from "./geo.js?v=202611031900";
 
 const PDF = "books/kothin-kotha-50-proshno.pdf";
 const SPUN = "kk-spun";
@@ -153,6 +153,8 @@ function openWheel() {
     dlg.addEventListener("click", (e) => {
       if (e.target === dlg || e.target.closest("[data-close]")) dlg.close();
       if (e.target.closest("[data-go]")) spin();
+      if (e.target.closest("[data-wa]")) dlg.querySelector(".kk-wapop").hidden = false;
+      if (e.target.closest("[data-ok]")) dlg.querySelector(".kk-wapop").hidden = true;
     });
   }
   dlg.innerHTML = `
@@ -227,7 +229,16 @@ function result(again) {
 function inappHtml() {
   const url = new URL(PDF, location.href).href;
   const wa = `https://wa.me/?text=${encodeURIComponent("📖 আমার ই-বুক: কঠিন কথা বলার ৫০টা প্রশ্ন\n" + url)}`;
-  return `<a class="btn btn-gold kk-wa" href="${wa}" target="_blank" rel="noopener"><img src="assets/img/whatsapp.png" alt="" width="26" height="26">PDF DOWNLOAD</a>`;
+  // আগে একটা ছোট পপআপ বুঝিয়ে দেয় কেন WhatsApp — "বুঝলাম" চাপলেই WhatsApp খোলে
+  return `
+    <button class="btn btn-gold kk-wa" type="button" data-wa><img src="assets/img/whatsapp.png" alt="" width="26" height="26">PDF DOWNLOAD</button>
+    <div class="kk-wapop" role="alertdialog" aria-labelledby="kk-wapop-h" hidden>
+      <div class="kk-wapop-card">
+        <img src="assets/img/whatsapp.png" alt="" width="56" height="56">
+        <p id="kk-wapop-h"><b>Instagram বা Facebook থেকে সরাসরি PDF ডাউনলোড হয় না।</b><br>তাই WhatsApp-এ নিজেকে পাঠিয়ে নিন, তারপর সেখান থেকে ডাউনলোড করে নিন।</p>
+        <a class="btn btn-maroon" href="${wa}" target="_blank" rel="noopener" data-ok>বুঝলাম</a>
+      </div>
+    </div>`;
 }
 
 function confetti() {
