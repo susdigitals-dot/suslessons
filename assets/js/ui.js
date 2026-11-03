@@ -69,6 +69,16 @@ const NAV = [
   ["stories.html", "গল্প"],
   ["stories.html?type=slides", "স্লাইড গল্প"],
   ["books.html", "বই"],
+  ["shop.html", "দোকান"],
+];
+
+// ফুটারের আইনি পাতা — পেমেন্ট গেটওয়ে (Razorpay ইত্যাদি) এগুলো চায়
+const LEGAL = [
+  ["contact.html", "যোগাযোগ"],
+  ["privacy.html", "Privacy Policy"],
+  ["terms.html", "Terms & Conditions"],
+  ["refund.html", "Refund Policy"],
+  ["disclosure.html", "Affiliate Disclosure"],
 ];
 
 export function chrome(settings) {
@@ -110,8 +120,12 @@ export function chrome(settings) {
           ${settings.facebook ? `<a href="${safeUrl(settings.facebook)}" target="_blank" rel="noopener">Facebook</a>` : ""}
         </nav>
       </div>
+      <nav class="wrap foot-legal" aria-label="নীতি ও যোগাযোগ">
+        ${LEGAL.map(([h, l]) => `<a href="${root()}${h}">${l}</a>`).join("")}
+      </nav>
       <div class="wrap foot-small">
-        <small>© ${bn(new Date().getFullYear())} sus.lessons · #sus_lessons</small>
+        <small>© ${bn(new Date().getFullYear())} ${esc(settings.business?.name || "sus.lessons")} · #sus_lessons</small>
+        <small>কিছু লিংক affiliate — সেখান থেকে কিনলে আপনার খরচ বাড়ে না, আমরা সামান্য কমিশন পাই।</small>
       </div>`;
   }
 }
@@ -183,6 +197,90 @@ export function bookCard(b, { direct = false } = {}) {
         </div>`}
       </div>
     </article>`;
+}
+
+// ── দোকান ───────────────────────────
+export const KINDS = {
+  ebook: "ই-বুক",
+  notes: "নোটস",
+  guide: "গাইড",
+  checklist: "চেকলিস্ট",
+  affiliate: "প্রস্তাবিত",
+};
+
+export const price = (n) => (Number(n) > 0 ? `₹${bn(Number(n).toLocaleString("en-IN"))}` : "ফ্রি");
+
+export function priceTag(p) {
+  if (p.kind === "affiliate" && !p.price) return "";
+  const off = p.mrp > p.price && p.price > 0;
+  return `<p class="price"><b>${price(p.price)}</b>${off ? `<s>${price(p.mrp)}</s><span class="off">${bn(Math.round((1 - p.price / p.mrp) * 100))}% ছাড়</span>` : ""}</p>`;
+}
+
+// কভার না থাকলে মেরুন মলাট, ওপরে জিনিসের ধরন
+export function productMock(p, size = "") {
+  if (p.cover_url) return `<div class="prod-mock has-img ${size}"><img src="${safeUrl(p.cover_url)}" alt="${esc(p.title)}" loading="lazy"></div>`;
+  return `
+    <div class="prod-mock ${size}">
+      <div class="bm-frame">
+        <span class="bm-mark">— sus.lessons —</span>
+        <span class="pm-kind">${esc(KINDS[p.kind] || "")}</span>
+        <span class="bm-bn">${esc(p.title)}</span>
+        <span class="bm-rule"></span>
+      </div>
+    </div>`;
+}
+
+// affiliate হলে সোজা দোকানে, নিজের জিনিস হলে বিস্তারিত পাতায়
+export function productCard(p) {
+  const aff = p.kind === "affiliate";
+  const href = aff ? safeUrl(p.buy_url) : `product.html?p=${encodeURIComponent(p.slug)}`;
+  const attrs = aff ? ` target="_blank" rel="sponsored noopener"` : "";
+  return `
+    <article class="prod-card">
+      <a href="${href}"${attrs}>${productMock(p)}</a>
+      <div class="pc-body">
+        <span class="chip">${esc(KINDS[p.kind] || "")}</span>
+        <h3><a href="${href}"${attrs}>${esc(p.title)}</a></h3>
+        ${p.subtitle ? `<p class="pc-sub">${inline(p.subtitle)}</p>` : ""}
+        ${priceTag(p)}
+        <a class="btn ${aff ? "btn-gold" : "btn-maroon"}" href="${href}"${attrs}>${aff ? `${esc(p.store || "দোকান")}-এ দেখুন ↗` : "বিস্তারিত দেখুন →"}</a>
+      </div>
+    </article>`;
+}
+
+// ── ব্যবসার তথ্য (আইনি পাতা আর যোগাযোগ) ───────────────────────────
+const digits = (s = "") => String(s).replace(/[^\d+]/g, "");
+
+export function contactWays(biz, settings) {
+  const wa = digits(biz.whatsapp).replace(/^\+/, "");
+  return [
+    biz.email && ["ইমেইল", `<a href="mailto:${esc(biz.email)}">${esc(biz.email)}</a>`],
+    biz.phone && ["ফোন", `<a href="tel:${esc(digits(biz.phone))}">${esc(biz.phone)}</a>`],
+    wa && ["WhatsApp", `<a href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">${esc(biz.whatsapp)}</a>`],
+    settings?.instagram && ["Instagram", `<a href="${safeUrl(settings.instagram)}" target="_blank" rel="noopener">@sus.lessons</a>`],
+    biz.address && ["ঠিকানা", esc(biz.address).replace(/\n/g, "<br>")],
+    biz.hours && ["সময়", esc(biz.hours)],
+  ].filter(Boolean);
+}
+
+// [data-biz="email"] ইত্যাদি ঘর আর [data-biz-card] বাক্স settings.business থেকে ভরো
+export function fillBiz(settings) {
+  const biz = settings.business || {};
+  const contactLink = `<a href="contact.html">our contact page</a>`;
+  const val = {
+    name: esc(biz.name || "sus.lessons"),
+    email: biz.email ? `<a href="mailto:${esc(biz.email)}">${esc(biz.email)}</a>` : contactLink,
+    city: esc(biz.city || "the place of our registered address"),
+    refundDays: esc(String(biz.refundDays || 7)),
+  };
+  $$("[data-biz]").forEach((el) => (el.innerHTML = val[el.dataset.biz] ?? ""));
+  $$("[data-biz-card]").forEach((el) => {
+    const rows = contactWays(biz, settings);
+    el.innerHTML = `
+      <p><b>${val.name}</b>${biz.owner ? ` · ${esc(biz.owner)}` : ""}</p>
+      ${rows.map(([k, v]) => `<p><span>${k}</span> ${v}</p>`).join("")}
+      <p><a href="contact.html">Contact form →</a></p>`;
+  });
 }
 
 // এন্ড কার্ড — মেরুন, শেষ লাইন + ফলো পিল

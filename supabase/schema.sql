@@ -160,6 +160,55 @@ as $$
   );
 $$;
 
+-- ── দোকান: ই-বুক, নোটস, গাইড, চেকলিস্ট (বিক্রি) + প্রস্তাবিত জিনিস (affiliate) ───────────────────────────
+-- পেমেন্ট আর ফাইল পাঠানো হয় buy_url-এর প্ল্যাটফর্মে (Razorpay Payment Page / Instamojo / Cosmofeed / Gumroad ইত্যাদি)
+create table if not exists public.products (
+  id uuid primary key default gen_random_uuid(),
+  slug text unique not null,
+  kind text not null default 'ebook' check (kind in ('ebook', 'notes', 'guide', 'checklist', 'affiliate')),
+  title text not null,
+  subtitle text default '',
+  description text default '',
+  includes jsonb not null default '[]',    -- ["৪২ পাতার PDF", "প্রিন্ট করার মতো চেকলিস্ট"]
+  cover_url text default '',
+  price int not null default 0,            -- টাকায়; ০ = ফ্রি
+  mrp int not null default 0,              -- কাটা দাম (থাকলে)
+  format text default '',                  -- PDF · ৪২ পাতা
+  buy_url text not null default '',        -- পেমেন্ট লিংক / affiliate লিংক
+  store text default '',                   -- affiliate হলে দোকানের নাম (Amazon)
+  preview_url text default '',             -- ফ্রি স্যাম্পল PDF
+  featured boolean not null default false,
+  sort int not null default 100,
+  published boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+drop trigger if exists products_touch on public.products;
+create trigger products_touch before update on public.products for each row execute function public.touch();
+alter table public.products enable row level security;
+drop policy if exists "products public read" on public.products;
+create policy "products public read" on public.products for select using (published or public.is_admin());
+drop policy if exists "products admin write" on public.products;
+create policy "products admin write" on public.products for all using (public.is_admin()) with check (public.is_admin());
+
+-- ── যোগাযোগ ফর্মের মেসেজ ───────────────────────────
+-- যে কেউ পাঠাতে পারবে, পড়তে পারবে শুধু admin
+create table if not exists public.messages (
+  id bigint generated always as identity primary key,
+  name text not null check (length(name) between 1 and 120),
+  contact text not null check (length(contact) between 3 and 160),   -- ইমেইল বা ফোন
+  topic text not null default '' check (length(topic) <= 60),
+  body text not null check (length(body) between 1 and 4000),
+  done boolean not null default false,
+  created_at timestamptz not null default now()
+);
+create index if not exists messages_time_idx on public.messages (created_at desc);
+alter table public.messages enable row level security;
+drop policy if exists "messages anyone insert" on public.messages;
+create policy "messages anyone insert" on public.messages for insert to anon, authenticated with check (done = false);
+drop policy if exists "messages admin all" on public.messages;
+create policy "messages admin all" on public.messages for all using (public.is_admin()) with check (public.is_admin());
+
 -- ── প্রথম অ্যাডমিন ───────────────────────────
 -- যে ইমেইল দিয়ে admin প্যানেলে লগইন করবে, সেটা এখানে দাও
 insert into public.admins (email) values ('maitys8289@gmail.com') on conflict do nothing;

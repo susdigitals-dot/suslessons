@@ -31,6 +31,18 @@ export const SEED = {
       bkash: "",
       link: "",
     },
+    // দোকান আর আইনি পাতায় (Privacy, Terms, Refund, Contact) এগুলো দেখায় — admin → সেটিংস থেকে ভরো
+    business: {
+      name: "sus.lessons",
+      owner: "",
+      email: "",
+      phone: "",
+      whatsapp: "",
+      address: "",
+      city: "",
+      hours: "সোম–শনি, সকাল ১০টা – সন্ধ্যা ৬টা",
+      refundDays: 7,
+    },
   },
 
   books: [
@@ -334,4 +346,7 @@ Allen Carr বলেন, সিগারেট যে অস্থিরতা�
       published_at: "2026-10-12",
     },
   ],
+
+  // দোকানের জিনিস — admin → প্রোডাক্ট থেকে যোগ করো
+  products: [],
 };

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contact Us · sus.lessons</title>
+  <meta name="description" content="Contact sus.lessons — orders, refunds, collaborations and questions.">
+  <meta name="theme-color" content="#3E2228">
+  <link rel="icon" href="assets/brand/avatar.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;500;600;700&family=Lora:ital,wght@0,500;0,600;1,500;1,600&family=Tiro+Bangla&display=swap" rel="stylesheet">
+  <link rel="canonical" href="https://suslessons.in/contact.html">
+  <link rel="stylesheet" href="assets/css/site.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script type="module" src="assets/js/contact.js"></script>
+</head>
+<body>
+  <header id="site-header"></header>
+  <main class="wrap legal">
+    <div class="page-head">
+      <span class="eyebrow">Contact us</span>
+      <h1>যোগাযোগ</h1>
+      <p>অর্ডার, ডাউনলোড, রিফান্ড, কোলাব বা শুধু একটা গল্পের কথা — লিখুন, ২ কাজের দিনের মধ্যে উত্তর দিই।</p>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-ways" id="ways"></div>
+      <form class="contact-form" id="contactForm">
+        <h2>মেসেজ পাঠান</h2>
+        <label class="field"><span>আপনার নাম</span><input type="text" name="name" required maxlength="120" autocomplete="name"></label>
+        <label class="field"><span>ইমেইল বা ফোন নম্বর</span><input type="text" name="contact" required minlength="3" maxlength="160" autocomplete="email"></label>
+        <label class="field"><span>বিষয়</span>
+          <select name="topic">
+            <option>অর্ডার / ডাউনলোড</option>
+            <option>রিফান্ড</option>
+            <option>কোলাব / বিজ্ঞাপন</option>
+            <option>অন্য কিছু</option>
+          </select>
+        </label>
+        <label class="field"><span>মেসেজ</span><textarea name="body" required maxlength="4000" rows="5" placeholder="অর্ডারের ব্যাপারে হলে Order / Transaction ID লিখুন"></textarea></label>
+        <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <button class="btn btn-maroon" type="submit">পাঠান →</button>
+        <p class="form-note">আপনার তথ্য শুধু উত্তর দেওয়ার জন্য — <a href="privacy.html">Privacy Policy</a></p>
+      </form>
+    </div>
+  </main>
+  <footer id="site-footer"></footer>
+</body>
+</html>

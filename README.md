@@ -7,6 +7,9 @@ A static site (GitHub Pages) with Supabase as the database and admin backend.
 | `index.html` | Home: hero, new stories, sliding stories, "আজকের বই" (book of the day), bookshelf |
 | `stories.html` / `story.html?s=slug` | Written stories and sliding (carousel) stories |
 | `books.html` / `book.html?b=slug` | Book recommendations with affiliate links and free PDFs |
+| `shop.html` / `product.html?p=slug` | Shop: e-books, notes, guides, checklists (sold via payment links) + recommended affiliate items |
+| `contact.html` | Contact details + form (messages land in admin → মেসেজ) |
+| `privacy.html`, `terms.html`, `refund.html`, `disclosure.html` | Legal pages; business name/email/address come from admin → সেটিংস |
 | `admin/` | Admin panel for adding/editing stories, slides, books and settings |
 
 ## Connect it (one-time setup)

@@ -75,5 +75,38 @@ export async function getSettings() {
   );
   // DB-তে যা নেই, সেটা seed থেকে নাও
   const v = row?.value || {};
-  return { ...SEED.settings, ...v, support: { ...SEED.settings.support, ...(v.support || {}) } };
+  return {
+    ...SEED.settings,
+    ...v,
+    support: { ...SEED.settings.support, ...(v.support || {}) },
+    business: { ...SEED.settings.business, ...(v.business || {}) },
+  };
+}
+
+export function listProducts({ kind } = {}) {
+  return q(
+    () => {
+      let r = sb.from("products").select("*").eq("published", true).order("sort", { ascending: true });
+      if (kind) r = r.eq("kind", kind);
+      return r;
+    },
+    () => {
+      let p = SEED.products.filter((x) => x.published).sort((a, c) => a.sort - c.sort);
+      return kind ? p.filter((x) => x.kind === kind) : p;
+    }
+  );
+}
+
+export function getProduct(slug) {
+  return q(
+    () => sb.from("products").select("*").eq("slug", slug).eq("published", true).maybeSingle(),
+    () => SEED.products.find((x) => x.slug === slug && x.published) || null
+  );
+}
+
+// যোগাযোগ ফর্ম → messages টেবিল (Supabase না থাকলে error ফেরত দেয়)
+export async function sendMessage(msg) {
+  if (!live) return { error: { message: "offline" } };
+  const { error } = await sb.from("messages").insert(msg);
+  return { error };
 }
