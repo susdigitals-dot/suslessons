@@ -1,12 +1,13 @@
 import { getSettings, listProducts } from "./data.js?v=202611031900";
 import "./track.js?v=202611031900";
 import { $, esc, inline, chrome, productCard, productMock, KINDS } from "./ui.js?v=202611031900";
-import { featureHtml, initFeature, openWheel } from "./kothin.js?v=202611032330";
+import { BOOK, initFeature, openWheel } from "./kothin.js?v=202611042000";
 
 const show = new URLSearchParams(location.search).get("kind") || "";
 
-// সাইটের কোডে রাখা বই (DB-তে নেই) — ফিচার বইয়ের মতোই দুটো বোতাম, দুটোতেই দামের চাকা
+// সাইটের কোডে রাখা বই (DB-তে নেই) — প্রতিটায় দুটো বোতাম, দুটোতেই দামের চাকা
 const BOOKS = [
+  BOOK,
   {
     kind: "guide",
     slug: "aaj-charo-kal-dhoro-na",
@@ -40,9 +41,8 @@ if (location.pathname.endsWith("/shop.html")) history.replaceState(null, "", "/s
 const settings = await getSettings();
 chrome(settings);
 
-// সব ফিল্টারে ফিচার বইটা ওপরে
-$("#feature").innerHTML = featureHtml();
-initFeature(BOOKS);
+// কোনো বই আলাদা করে ফিচার করা হয় না — শুধু ভাসমান ই-বুক বোতাম আর #spin
+initFeature(BOOKS.slice(1));
 
 const all = [...BOOKS, ...(await listProducts())];
 
@@ -54,7 +54,7 @@ if (kinds.length > 1)
     .join("");
 
 const items = show ? all.filter((p) => p.kind === show) : all;
-// ফিচার বইটা তো আছেই — আর কিছু না থাকলে "শীঘ্রই আসছে" না দেখিয়ে ঘরটা লুকিয়ে রাখো
+// কিছু না থাকলে "শীঘ্রই আসছে" না দেখিয়ে ঘরটা লুকিয়ে রাখো
 $("#shop").innerHTML = items.map((p) => (p.pdf ? bookCard(p) : productCard(p))).join("");
 $("#shop").hidden = !items.length;
 $("#shop").addEventListener("click", (e) => {

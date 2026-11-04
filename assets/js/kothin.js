@@ -4,7 +4,16 @@ import { $, bn, esc, inline, wordmark } from "./ui.js?v=202611031900";
 import { isIndia } from "./geo.js?v=202611031900";
 
 // চাকা যে বইয়ের জন্য ঘোরে — দোকানের অন্য বইও openWheel-এ নিজের {title, pdf, spun} দেয়
-const BOOK = { title: "কঠিন কথা বলার ৫০টা প্রশ্ন", tag: "চুপ আর চিৎকারের মাঝের রাস্তা", pdf: "books/kothin-kotha-50-proshno.pdf", spun: "kk-spun" };
+// দোকানে এখন আর ফিচার করা হয় না — বাকি বইগুলোর মতোই একটা সাধারণ কার্ড
+export const BOOK = {
+  kind: "ebook",
+  slug: "kothin-kotha",
+  title: "কঠিন কথা বলার ৫০টা প্রশ্ন",
+  subtitle: "রাগের মাথায় যে লাইনটা বেরিয়ে আসে, সেটা ==সম্পর্ক ভাঙে।== একটা শান্ত প্রশ্ন সেই কথাটাই বলে।",
+  tag: "চুপ আর চিৎকারের মাঝের রাস্তা",
+  pdf: "books/kothin-kotha-50-proshno.pdf",
+  spun: "kk-spun",
+};
 
 // Facebook / Instagram-এর ভেতরের ব্রাউজারে PDF নামানো যায় না (?inapp দিয়ে পরীক্ষা করা যায়)
 export const INAPP = /FBAN|FBAV|FB_IAB|FBIOS|Instagram|Messenger|Threads|; wv\)/i.test(navigator.userAgent) || /[?&]inapp\b/.test(location.search);
@@ -94,9 +103,8 @@ export function featureHtml() {
 
 // more: দোকানের বাকি বই — ভাসমান বোতাম চাপলে আগে জিজ্ঞেস করে কোনটা নেবেন
 export function initFeature(more = []) {
-  const root = $("#kothin-kotha");
-  if (!root) return;
-  root.addEventListener("click", (e) => {
+  // ফিচার অংশটা পাতায় না থাকলেও ভাসমান বোতাম আর #spin কাজ করে
+  $("#kothin-kotha")?.addEventListener("click", (e) => {
     if (e.target.closest("[data-wheel]")) openWheel(BOOK);
     const card = e.target.closest(".kk-card");
     if (card) {
