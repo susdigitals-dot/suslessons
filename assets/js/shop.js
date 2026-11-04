@@ -18,6 +18,16 @@ const BOOKS = [
     spun: "kk-spun-aaj-charo",
     tag: "যে অভ্যাস আজই ছাড়বে",
   },
+  {
+    kind: "guide",
+    slug: "chup-kore-shonar-shokti",
+    title: "চুপ করে শোনার শক্তি",
+    subtitle: "পারিবারিক ঝামেলায় ==কে আসলে কী চায়==, চিনে নেওয়ার গাইড",
+    cover_url: "assets/img/shop/chup-kore-cover.jpg",
+    pdf: "books/chup-kore-shonar-shokti.pdf",
+    spun: "kk-spun-chup-kore",
+    tag: "পারিবারিক ঝামেলায় কে কী চায়",
+  },
 ];
 
 function bookCard(p) {
