@@ -7,6 +7,16 @@ const show = new URLSearchParams(location.search).get("kind") || "";
 
 // সাইটের কোডে রাখা বই (DB-তে নেই) — প্রতিটায় দুটো বোতাম, দুটোতেই দামের চাকা
 const BOOKS = [
+  {
+    kind: "guide",
+    slug: "maniye-ne-noy-ami-achi",
+    title: "“মানিয়ে নে” নয়, “আমি আছি”",
+    subtitle: "মেয়ের শ্বশুরবাড়িতে ==বিপদ চেনার== আর পাশে দাঁড়ানোর গাইড",
+    cover_url: "assets/img/shop/maniye-ne-cover.jpg",
+    pdf: "books/maniye-ne-noy-ami-achi.pdf",
+    spun: "kk-spun-maniye-ne",
+    tag: "মেয়ের শ্বশুরবাড়িতে বিপদ চেনা",
+  },
   BOOK,
   {
     kind: "guide",
@@ -52,7 +62,7 @@ const settings = await getSettings();
 chrome(settings);
 
 // কোনো বই আলাদা করে ফিচার করা হয় না — শুধু ভাসমান ই-বুক বোতাম আর #spin
-initFeature(BOOKS.slice(1));
+initFeature(BOOKS.filter((b) => b !== BOOK));
 
 const all = [...BOOKS, ...(await listProducts())];
 
