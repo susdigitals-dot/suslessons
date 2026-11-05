@@ -36,6 +36,8 @@ export function renderBody(src = "") {
       if (b.startsWith("> ")) return `<blockquote class="statement">${inline(b.slice(2))}</blockquote>`;
       if (b.startsWith("• ")) return `<p><span class="tag tag-now">${inline(b.slice(2))}</span></p>`;
       if (b.startsWith("~ ")) return `<p><span class="tag tag-past">${inline(b.slice(2))}</span></p>`;
+      const lines = b.split("\n");
+      if (lines.every((l) => /^[-*] /.test(l.trim()))) return `<ul>${lines.map((l) => `<li>${inline(l.trim().slice(2))}</li>`).join("")}</ul>`;
       const img = b.match(/^!\[(.*?)\]\((.+?)\)$/);
       if (img) return `<figure><img src="${safeUrl(img[2])}" alt="${esc(img[1])}" loading="lazy">${img[1] ? `<figcaption>${esc(img[1])}</figcaption>` : ""}</figure>`;
       const say = b.match(/^@(.+?):\s*([\s\S]+)$/);

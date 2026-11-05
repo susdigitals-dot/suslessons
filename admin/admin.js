@@ -1,8 +1,8 @@
 // sus.lessons admin — গল্প, স্লাইড গল্প, বই আর সেটিংস লেখার জায়গা
-import { CONFIG } from "../assets/js/config.js?v=202611051856";
-import { SEED } from "../assets/js/seed.js?v=202611051856";
-import { live, sb } from "../assets/js/data.js?v=202611051856";
-import { $, $$, esc, avatar, wordmark, toast, KINDS, price } from "../assets/js/ui.js?v=202611051856";
+import { CONFIG } from "../assets/js/config.js?v=202611051905";
+import { SEED } from "../assets/js/seed.js?v=202611051905";
+import { live, sb } from "../assets/js/data.js?v=202611051905";
+import { $, $$, esc, avatar, wordmark, toast, KINDS, price } from "../assets/js/ui.js?v=202611051905";
 
 const app = $("#app");
 let user = null;
@@ -222,6 +222,7 @@ async function storiesList() {
     <div class="top">
       <h1>গল্প</h1>
       <div class="acts">
+        <label class="btn btn-gold btn-sm" title="JSON ফাইল থেকে গল্প আনো — সব অপ্রকাশিত অবস্থায় আসবে">ড্রাফট ইমপোর্ট<input type="file" id="importDrafts" accept=".json,application/json" hidden></label>
         <button class="btn btn-maroon btn-sm" data-new>+ নতুন গল্প</button>
       </div>
     </div>
@@ -229,6 +230,7 @@ async function storiesList() {
     <div class="table">${data.map((s) => row(s, "story")).join("") || `<p class="empty">খালি</p>`}</div>`;
   $$("[data-new]").forEach((b) => (b.onclick = () => storyForm({})));
   $("#importSeed")?.addEventListener("click", importSeed);
+  $("#importDrafts")?.addEventListener("change", importDrafts);
   bindRows("stories", storyForm);
 }
 
@@ -749,6 +751,34 @@ function fail(error, page = false) {
   if (page && /does not exist|schema cache/.test(m))
     return (main().innerHTML = `<div class="notice">এই অংশের টেবিল এখনো তৈরি হয়নি।<br>Supabase SQL Editor-এ আবার <code>supabase/schema.sql</code> পুরোটা Run করো।</div>`);
   toast(/duplicate key/.test(m) ? "এই slug আগে থেকেই আছে — অন্য slug দাও" : "সমস্যা: " + m);
+}
+
+// JSON ফাইল (গল্পের তালিকা) থেকে ড্রাফট আনো — সব অপ্রকাশিত; একই slug থাকলে সেটা বাদ যায়, ওভাররাইট হয় না
+async function importDrafts(e) {
+  const file = e.target.files?.[0];
+  e.target.value = "";
+  if (!file) return;
+  let list;
+  try {
+    list = JSON.parse(await file.text());
+    if (!Array.isArray(list)) list = list.stories;
+    if (!Array.isArray(list) || !list.length) throw new Error("ফাইলে কোনো গল্প নেই");
+  } catch (err) {
+    return toast("ফাইলটা পড়া গেল না: " + err.message);
+  }
+  const keep = ["slug", "title", "excerpt", "last_line", "cover_url", "book_slug", "law", "tags", "body"];
+  const rows = list
+    .filter((s) => s && s.slug && s.title && s.body)
+    .map((s) => ({ ...Object.fromEntries(keep.filter((k) => k in s).map((k) => [k, s[k]])), type: "blog", published: false, slides: [] }));
+  const { data: have } = await sb.from("stories").select("slug").in("slug", rows.map((r) => r.slug));
+  const taken = new Set((have || []).map((r) => r.slug));
+  const fresh = rows.filter((r) => !taken.has(r.slug));
+  if (!fresh.length) return toast("সব গল্প আগে থেকেই আছে — কিছু যোগ হয়নি");
+  if (!confirm(`${fresh.length}টা গল্প অপ্রকাশিত ড্রাফট হিসেবে যোগ করব?${taken.size ? `\n(${taken.size}টা আগে থেকেই আছে, বাদ যাবে)` : ""}`)) return;
+  const { error } = await sb.from("stories").insert(fresh);
+  if (error) return fail(error);
+  toast(`${fresh.length}টা ড্রাফট যোগ হয়েছে ✓ — পড়ে দেখে প্রকাশ করো`);
+  go("stories");
 }
 
 // নমুনা লেখা DB-তে তোলো (প্রথমবারের জন্য)
