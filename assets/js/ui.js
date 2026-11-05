@@ -73,6 +73,7 @@ const NAV = [
 
 // ফুটারের আইনি পাতা — পেমেন্ট গেটওয়ে (Razorpay ইত্যাদি) এগুলো চায়
 const LEGAL = [
+  ["about.html", "আমাদের কথা"],
   ["contact.html", "যোগাযোগ"],
   ["privacy.html", "Privacy Policy"],
   ["terms.html", "Terms & Conditions"],
