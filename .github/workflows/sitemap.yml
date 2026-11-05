@@ -1,0 +1,30 @@
+# প্রতিদিন রাত ১২:১০ (ভারতের সময়) sitemap.xml নতুন করে বানায় — নির্ধারিত গল্প সেদিন প্রকাশ হলে Google খুঁজে পায়
+name: Daily sitemap
+
+on:
+  schedule:
+    - cron: "40 18 * * *"   # 18:40 UTC = 00:10 IST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sitemap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python tools/sitemap.py
+      - name: Commit if changed
+        run: |
+          # শুধু lastmod বদলালে কমিট নয় — নতুন/বাদ পড়া URL থাকলে তবেই
+          if git diff --quiet -- sitemap.xml; then echo "no change"; exit 0; fi
+          if [ "$(git diff -U0 -- sitemap.xml | grep '^[-+]  <url>' | sed 's/<lastmod>[^<]*<\/lastmod>//' | sed 's/^[-+]//' | sort | uniq -u | wc -l)" = "0" ]; then echo "only dates changed"; git checkout -- sitemap.xml; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add sitemap.xml
+          git commit -m "sitemap: daily refresh"
+          git push

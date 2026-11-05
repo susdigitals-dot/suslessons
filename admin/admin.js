@@ -1,8 +1,8 @@
 // sus.lessons admin — গল্প, স্লাইড গল্প, বই আর সেটিংস লেখার জায়গা
-import { CONFIG } from "../assets/js/config.js?v=202611051905";
-import { SEED } from "../assets/js/seed.js?v=202611051905";
-import { live, sb } from "../assets/js/data.js?v=202611051905";
-import { $, $$, esc, avatar, wordmark, toast, KINDS, price } from "../assets/js/ui.js?v=202611051905";
+import { CONFIG } from "../assets/js/config.js?v=202611051913";
+import { SEED } from "../assets/js/seed.js?v=202611051913";
+import { live, sb } from "../assets/js/data.js?v=202611051913";
+import { $, $$, esc, avatar, wordmark, toast, KINDS, price } from "../assets/js/ui.js?v=202611051913";
 
 const app = $("#app");
 let user = null;
@@ -244,7 +244,9 @@ function row(x, kind) {
       <div>
         <h3>${esc((x.title || "").replace(/==|\*\*/g, ""))}</h3>
         <div class="sub">
-          <span class="status ${pub ? "on" : "off"}">${pub ? "প্রকাশিত" : "খসড়া"}</span>
+          ${kind === "story" && pub && x.published_at && String(x.published_at).slice(0, 10) > new Date().toLocaleDateString("en-CA")
+            ? `<span class="status off">নির্ধারিত · ${esc(x.published_at)}</span>`
+            : `<span class="status ${pub ? "on" : "off"}">${pub ? "প্রকাশিত" : "খসড়া"}</span>`}
           ${kind === "story" ? `${x.type === "slides" ? `<span class="status off">স্লাইড — সাইটে দেখায় না</span>` : ""}<span>${esc(x.published_at || "")}</span>`
             : kind === "product" ? `<span>${esc(KINDS[x.kind] || "")}</span><span>${x.kind === "affiliate" && !x.price ? "affiliate" : price(x.price)}</span>${x.buy_url ? "" : `<span class="status off">কেনার লিংক নেই</span>`}`
             : `<span>${esc(x.author || "")}</span>`}
@@ -766,18 +768,24 @@ async function importDrafts(e) {
   } catch (err) {
     return toast("ফাইলটা পড়া গেল না: " + err.message);
   }
-  const keep = ["slug", "title", "excerpt", "last_line", "cover_url", "book_slug", "law", "tags", "body"];
+  const keep = ["slug", "title", "excerpt", "last_line", "cover_url", "book_slug", "law", "tags", "body", "published_at"];
+  // ফাইলে published: true আর ভবিষ্যতের published_at থাকলে গল্পটা "নির্ধারিত" — সেই তারিখে নিজে থেকেই সাইটে আসবে
   const rows = list
     .filter((s) => s && s.slug && s.title && s.body)
-    .map((s) => ({ ...Object.fromEntries(keep.filter((k) => k in s).map((k) => [k, s[k]])), type: "blog", published: false, slides: [] }));
+    .map((s) => ({ ...Object.fromEntries(keep.filter((k) => k in s).map((k) => [k, s[k]])), type: "blog", published: s.published === true, slides: [] }));
   const { data: have } = await sb.from("stories").select("slug").in("slug", rows.map((r) => r.slug));
   const taken = new Set((have || []).map((r) => r.slug));
   const fresh = rows.filter((r) => !taken.has(r.slug));
   if (!fresh.length) return toast("সব গল্প আগে থেকেই আছে — কিছু যোগ হয়নি");
-  if (!confirm(`${fresh.length}টা গল্প অপ্রকাশিত ড্রাফট হিসেবে যোগ করব?${taken.size ? `\n(${taken.size}টা আগে থেকেই আছে, বাদ যাবে)` : ""}`)) return;
+  const sched = fresh.filter((r) => r.published);
+  const dates = sched.map((r) => r.published_at).filter(Boolean).sort();
+  const what = sched.length
+    ? `${sched.length}টা গল্প নির্ধারিত তারিখে প্রকাশ হবে (${dates[0]} থেকে ${dates[dates.length - 1]})${fresh.length > sched.length ? `, ${fresh.length - sched.length}টা খসড়া` : ""}`
+    : `${fresh.length}টা গল্প অপ্রকাশিত খসড়া হিসেবে`;
+  if (!confirm(`${what} — যোগ করব?${taken.size ? `\n(${taken.size}টা আগে থেকেই আছে, বাদ যাবে)` : ""}`)) return;
   const { error } = await sb.from("stories").insert(fresh);
   if (error) return fail(error);
-  toast(`${fresh.length}টা ড্রাফট যোগ হয়েছে ✓ — পড়ে দেখে প্রকাশ করো`);
+  toast(sched.length ? `${fresh.length}টা গল্প যোগ হয়েছে ✓ — তারিখ অনুযায়ী নিজে থেকেই সাইটে আসবে` : `${fresh.length}টা ড্রাফট যোগ হয়েছে ✓ — পড়ে দেখে প্রকাশ করো`);
   go("stories");
 }
 

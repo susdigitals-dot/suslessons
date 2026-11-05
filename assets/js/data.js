@@ -1,11 +1,15 @@
 // ডেটা লেয়ার — Supabase থাকলে সেখান থেকে, না থাকলে seed.js থেকে
-import { CONFIG } from "./config.js?v=202611051905";
-import { SEED } from "./seed.js?v=202611051905";
+import { CONFIG } from "./config.js?v=202611051913";
+import { SEED } from "./seed.js?v=202611051913";
 
 export const live = Boolean(CONFIG.supabaseUrl && CONFIG.supabaseAnonKey && window.supabase);
 export const sb = live ? window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseAnonKey) : null;
 
 const byDate = (a, b) => String(b.published_at || "").localeCompare(String(a.published_at || ""));
+
+// আজকের তারিখ (ভিউয়ারের নিজের সময় অনুযায়ী, YYYY-MM-DD) — এর পরের তারিখের গল্প "নির্ধারিত", সাইটে দেখায় না
+const today = () => new Date().toLocaleDateString("en-CA");
+const isOut = (x) => !x.published_at || String(x.published_at).slice(0, 10) <= today();
 
 // রিল/ভিডিওর স্ক্রিনশট সাইটে দেখানো হয় না — পুরোনো লেখায় থাকলেও বাদ
 const isVideoShot = (u = "") => /assets\/img\/(scene|thumb)-\d+\.jpg/i.test(u);
@@ -35,13 +39,13 @@ async function q(run, fallback) {
 export async function listStories({ limit, bookSlug } = {}) {
   const rows = await q(
     () => {
-      let r = sb.from("stories").select("*").eq("published", true).eq("type", "blog").order("published_at", { ascending: false });
+      let r = sb.from("stories").select("*").eq("published", true).eq("type", "blog").lte("published_at", today()).order("published_at", { ascending: false });
       if (bookSlug) r = r.eq("book_slug", bookSlug);
       if (limit) r = r.limit(limit);
       return r;
     },
     () => {
-      let s = SEED.stories.filter((x) => x.published && x.type === "blog").sort(byDate);
+      let s = SEED.stories.filter((x) => x.published && x.type === "blog" && isOut(x)).sort(byDate);
       if (bookSlug) s = s.filter((x) => x.book_slug === bookSlug);
       return limit ? s.slice(0, limit) : s;
     }
@@ -51,8 +55,8 @@ export async function listStories({ limit, bookSlug } = {}) {
 
 export async function getStory(slug) {
   const row = await q(
-    () => sb.from("stories").select("*").eq("slug", slug).eq("published", true).eq("type", "blog").maybeSingle(),
-    () => SEED.stories.find((x) => x.slug === slug && x.published && x.type === "blog") || null
+    () => sb.from("stories").select("*").eq("slug", slug).eq("published", true).eq("type", "blog").lte("published_at", today()).maybeSingle(),
+    () => SEED.stories.find((x) => x.slug === slug && x.published && x.type === "blog" && isOut(x)) || null
   );
   return clean(row);
 }

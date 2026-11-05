@@ -7,7 +7,7 @@
 import json
 import re
 import urllib.request
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from xml.sax.saxutils import escape
 
@@ -45,7 +45,9 @@ def day(v):
 
 
 urls = [(f"{SITE}/{p}", date.today().isoformat(), f, pr) for p, f, pr in STATIC]
-for s in rows("stories", "select=slug,published_at,updated_at&published=eq.true&type=eq.blog"):
+# নির্ধারিত (ভবিষ্যতের তারিখের) গল্প বাদ — ভারতের সময়ে আজ পর্যন্ত যা প্রকাশিত
+TODAY = (datetime.now(timezone.utc) + timedelta(hours=5, minutes=30)).date().isoformat()
+for s in rows("stories", f"select=slug,published_at,updated_at&published=eq.true&type=eq.blog&published_at=lte.{TODAY}"):
     urls.append((f"{SITE}/story.html?s={s['slug']}", day(s.get("updated_at") or s.get("published_at")), "monthly", "0.8"))
 for b in rows("books", "select=slug,updated_at&published=eq.true"):
     urls.append((f"{SITE}/book.html?b={b['slug']}", day(b.get("updated_at")), "monthly", "0.7"))

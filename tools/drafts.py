@@ -1,13 +1,24 @@
 """_drafts/stories/*.md → _drafts/stories.json (অ্যাডমিনের "ড্রাফট ইমপোর্ট" বোতামের জন্য)
 
-    python tools/drafts.py
+    python tools/drafts.py                                  # সব খসড়া (অপ্রকাশিত)
+    python tools/drafts.py --start 2026-11-05 --per-day 2   # নির্ধারিত: ফাইলের ক্রমে দিনে ২টা করে
+
+নির্ধারিত গল্প সাইটে আসে তার তারিখে (data.js আজকের পরের তারিখ লুকিয়ে রাখে)।
 
 প্রতিটা .md ফাইলের শুরুতে --- এর মাঝে slug, title, excerpt, last_line, book_slug, law, tags (কমা দিয়ে)।
 তারপর গল্পের body — সাইটের নিয়মে (• সময়, ~ অতীত, @নাম: সংলাপ, > উক্তি, ## শিরোনাম, - তালিকা, ==হাইলাইট==, **বোল্ড**)।
 """
+import argparse
 import json
 import re
+from datetime import date, timedelta
 from pathlib import Path
+
+ap = argparse.ArgumentParser()
+ap.add_argument("--start", help="প্রথম দিনের তারিখ YYYY-MM-DD")
+ap.add_argument("--per-day", type=int, default=2)
+args = ap.parse_args()
+start = date.fromisoformat(args.start) if args.start else None
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "_drafts" / "stories"
@@ -32,8 +43,11 @@ for f in sorted(SRC.glob("*.md")):
         "cover_url": meta.get("cover_url", ""),
         "body": m.group(2).strip(),
     }
+    if start:
+        story["published"] = True
+        story["published_at"] = (start + timedelta(days=len(out) // args.per_day)).isoformat()
     words = len(re.findall(r"\S+", story["body"]))
-    print(f"{f.name}: {story['slug']} — {words} শব্দ")
+    print(f"{f.name}: {story['slug']} — {words} শব্দ{' — ' + story['published_at'] if start else ''}")
     out.append(story)
 
 dest = ROOT / "_drafts" / "stories.json"

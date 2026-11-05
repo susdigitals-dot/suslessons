@@ -1,6 +1,6 @@
-import { getSettings, listStories, listBooks } from "./data.js?v=202611051905";
-import "./track.js?v=202611051905";
-import { $, inline, esc, safeUrl, chrome, storyCard, bookCard, bookMock, endCard, lawTag } from "./ui.js?v=202611051905";
+import { getSettings, listStories, listBooks } from "./data.js?v=202611051913";
+import "./track.js?v=202611051913";
+import { $, inline, esc, safeUrl, chrome, storyCard, bookCard, bookMock, endCard, lawTag } from "./ui.js?v=202611051913";
 
 const settings = await getSettings();
 chrome(settings);
