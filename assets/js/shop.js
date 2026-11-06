@@ -9,6 +9,16 @@ const show = new URLSearchParams(location.search).get("kind") || "";
 const BOOKS = [
   {
     kind: "guide",
+    slug: "ragher-mathay-bolar-age",
+    title: "রাগের মাথায় বলার আগে",
+    subtitle: "==ওই দশ সেকেন্ডে== কী করবে, আর ভুল কথা বলে ফেললে কীভাবে ফেরাবে",
+    cover_url: "assets/img/shop/ragher-mathay-cover.jpg",
+    pdf: "books/ragher-mathay-bolar-age.pdf",
+    spun: "kk-spun-ragher-mathay",
+    tag: "রাগের মাথায় ভুল কথা সামলানো",
+  },
+  {
+    kind: "guide",
     slug: "maniye-ne-noy-ami-achi",
     title: "“মানিয়ে নে” নয়, “আমি আছি”",
     subtitle: "মেয়ের শ্বশুরবাড়িতে ==বিপদ চেনার== আর পাশে দাঁড়ানোর গাইড",
