@@ -1,6 +1,6 @@
-import { getSettings, listBooks } from "./data.js?v=202611051913";
-import "./track.js?v=202611051913";
-import { $, chrome, bookCard } from "./ui.js?v=202611051913";
+import { getSettings, listBooks } from "./data.js?v=202611121349";
+import "./track.js?v=202611121349";
+import { $, chrome, bookCard } from "./ui.js?v=202611121349";
 
 const show = new URLSearchParams(location.search).get("show") || "";
 const settings = await getSettings();
@@ -11,9 +11,9 @@ let books = await listBooks();
 // ফ্রি PDF-এর বই থাকলে তবেই ফিল্টার দেখাও
 if (books.some((b) => b.pdf_url))
   $("#filters").innerHTML = [
-    ["", "সব বই"],
-    ["buy", "কেনার বই"],
-    ["free", "বিনামূল্যে PDF"],
+    ["", "All Books"],
+    ["buy", "Buy"],
+    ["free", "Free PDF"],
   ]
     .map(([k, l]) => `<a href="books.html${k ? "?show=" + k : ""}"${k === show ? ' aria-current="page"' : ""}>${l}</a>`)
     .join("");

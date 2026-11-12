@@ -7,7 +7,7 @@ A static site (GitHub Pages) with Supabase as the database and admin backend.
 | `index.html` | Home: hero, new stories, sliding stories, "আজকের বই" (book of the day), bookshelf |
 | `stories.html` / `story.html?s=slug` | Written stories and sliding (carousel) stories |
 | `books.html` / `book.html?b=slug` | Book recommendations with affiliate links and free PDFs |
-| `shop.html` (served as `/shop`) / `product.html?p=slug` | Shop: e-books, notes, guides, checklists (sold via payment links) + recommended affiliate items |
+| `free.html` (served as `/free`) | Free e-Books / PDFs: our own guides, direct download (list lives in `assets/js/free.js`). Old `/shop` and `product.html` links redirect here |
 | `contact.html` | Contact details + form (messages land in admin → মেসেজ) |
 | `privacy.html`, `terms.html`, `refund.html`, `disclosure.html` | Legal pages; business name/email/address come from admin → সেটিংস |
 | `admin/` | Admin panel for adding/editing stories, slides, books and settings |
@@ -26,6 +26,6 @@ A static site (GitHub Pages) with Supabase as the database and admin backend.
 
 Until Supabase is connected, the site shows the sample content from `assets/js/seed.js`.
 
-Local preview: `python tools/serve.py` (opens on port 5500 and serves `/shop` like GitHub Pages does).
+Local preview: `python tools/serve.py` (opens on port 5500 and serves `/free` like GitHub Pages does).
 
 Before each push, run `python tools/bump.py`. It stamps a new `?v=` on every CSS/JS link and import, so visitors get the new files right away instead of a cached copy (GitHub Pages lets browsers cache for 10 minutes).

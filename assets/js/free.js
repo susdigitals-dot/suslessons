@@ -1,11 +1,9 @@
-import { getSettings, listProducts } from "./data.js?v=202611051913";
-import "./track.js?v=202611051913";
-import { $, esc, inline, chrome, productCard, productMock, KINDS } from "./ui.js?v=202611051913";
-import { BOOK, initFeature, openWheel } from "./kothin.js?v=202611051913";
+import { getSettings } from "./data.js?v=202611121349";
+import "./track.js?v=202611121349";
+import { $, esc, inline, chrome, productMock } from "./ui.js?v=202611121349";
+import { BOOK, initFeature, openWheel } from "./kothin.js?v=202611121349";
 
-const show = new URLSearchParams(location.search).get("kind") || "";
-
-// সাইটের কোডে রাখা বই (DB-তে নেই) — প্রতিটায় দুটো বোতাম, দুটোতেই দামের চাকা
+// সাইটের কোডে রাখা Free e-Book (DB-তে নেই) — বোতাম চাপলেই দামের চাকা (সবসময় Free-তে থামে)
 const BOOKS = [
   {
     kind: "guide",
@@ -195,39 +193,25 @@ function bookCard(p) {
     <article class="prod-card" id="${esc(p.slug)}">
       <button class="pc-cover" type="button" data-book="${esc(p.slug)}" aria-label="${esc(p.title)}">${productMock(p)}</button>
       <div class="pc-body">
-        <span class="chip">${esc(KINDS[p.kind])} · PDF</span>
+        <span class="chip chip-free">FREE · PDF</span>
         <h3>${esc(p.title)}</h3>
         <p class="pc-sub">${inline(p.subtitle)}</p>
         <div class="pc-btns">
-          <button class="btn btn-maroon kk-dl" type="button" data-book="${esc(p.slug)}">⬇ DOWNLOAD NOW</button>
-          <button class="btn btn-ghost" type="button" data-book="${esc(p.slug)}">📖 ই-বুক নামান</button>
+          <button class="btn btn-maroon kk-dl" type="button" data-book="${esc(p.slug)}">⬇ FREE DOWNLOAD</button>
         </div>
       </div>
     </article>`;
 }
 
-// পুরোনো /shop.html লিংকে এলে ঠিকানায় /shop দেখাও (পাতা আবার লোড হয় না)
-if (location.pathname.endsWith("/shop.html")) history.replaceState(null, "", "/shop" + location.search + location.hash);
+// পুরোনো /free.html লিংকে এলে ঠিকানায় /free দেখাও (পাতা আবার লোড হয় না)
+if (location.pathname.endsWith("/free.html")) history.replaceState(null, "", "/free" + location.search + location.hash);
 const settings = await getSettings();
 chrome(settings);
 
-// কোনো বই আলাদা করে ফিচার করা হয় না — শুধু ভাসমান ই-বুক বোতাম আর #spin
-initFeature(BOOKS.filter((b) => b !== BOOK));
+initFeature(BOOKS);
 
-const all = [...BOOKS, ...(await listProducts())];
-
-// শুধু যে ধরনের জিনিস আছে, সেই ফিল্টারগুলো দেখাও
-const kinds = Object.keys(KINDS).filter((k) => all.some((p) => p.kind === k));
-if (kinds.length > 1)
-  $("#filters").innerHTML = [["", "সব"], ...kinds.map((k) => [k, KINDS[k]])]
-    .map(([k, l]) => `<a href="/shop${k ? "?kind=" + k : ""}"${k === show ? ' aria-current="page"' : ""}>${l}</a>`)
-    .join("");
-
-const items = show ? all.filter((p) => p.kind === show) : all;
-// কিছু না থাকলে "শীঘ্রই আসছে" না দেখিয়ে ঘরটা লুকিয়ে রাখো
-$("#shop").innerHTML = items.map((p) => (p.pdf ? bookCard(p) : productCard(p))).join("");
-$("#shop").hidden = !items.length;
-$("#shop").addEventListener("click", (e) => {
+$("#free").innerHTML = BOOKS.map(bookCard).join("");
+$("#free").addEventListener("click", (e) => {
   const b = BOOKS.find((x) => x.slug === e.target.closest("[data-book]")?.dataset.book);
   if (b) openWheel(b);
 });

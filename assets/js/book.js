@@ -1,6 +1,6 @@
-import { getSettings, getBook, listStories } from "./data.js?v=202611051913";
-import "./track.js?v=202611051913";
-import { $, esc, inline, safeUrl, chrome, bookMock, lawTag, storyCard, endCard, supportDialog, toast, setMeta } from "./ui.js?v=202611051913";
+import { getSettings, getBook, listStories } from "./data.js?v=202611121349";
+import "./track.js?v=202611121349";
+import { $, esc, inline, safeUrl, chrome, bookMock, lawTag, storyCard, endCard, supportDialog, toast, setMeta } from "./ui.js?v=202611121349";
 
 const slug = new URLSearchParams(location.search).get("b") || "";
 const settings = await getSettings();
@@ -10,7 +10,7 @@ const book = slug ? await getBook(slug) : null;
 const main = $("#book");
 
 if (!book) {
-  main.innerHTML = `<div class="empty"><h2>বইটা খুঁজে পেলাম না</h2><p><a class="section-link" href="books.html">বইয়ের তাকে ফিরুন →</a></p></div>`;
+  main.innerHTML = `<div class="empty"><h2>Book-টা খুঁজে পেলাম না</h2><p><a class="section-link" href="books.html">Bookshelf-এ ফিরুন →</a></p></div>`;
 } else {
   setMeta(book.title, book.description);
   const stories = await listStories({ bookSlug: book.slug });
@@ -29,8 +29,8 @@ if (!book) {
         ${(book.laws || []).length ? `<ul class="laws">${book.laws.map((l) => `<li>${lawTag(l.no)}<b>${esc(l.name)}</b><span>${esc(l.line)}</span></li>`).join("")}</ul>` : ""}
         ${book.pdf_url ? `
           <div class="free-box">
-            <p>এই বইটা বিনামূল্যে — PDF নামিয়ে নিন।</p>
-            <button class="btn btn-maroon" id="getFree">⬇ বইটা নিন</button>
+            <p>এই বইটা Free — PDF Download করুন।</p>
+            <button class="btn btn-maroon" id="getFree">⬇ Free Download</button>
           </div>` : ""}
         ${buy.length ? `<div class="buy-row">${buy.map((a) => `<a class="btn btn-gold" href="${safeUrl(a.url)}" target="_blank" rel="sponsored noopener">${esc(a.store)}-এ কিনুন ↗</a>`).join("")}</div>` : ""}
       </div>
@@ -38,7 +38,7 @@ if (!book) {
 
     ${stories.length ? `
       <section class="section">
-        <div class="section-head"><div><span class="eyebrow">Stories from this book</span><h2>এই বইয়ের গল্প</h2></div></div>
+        <div class="section-head"><div><span class="eyebrow">Stories from this book</span><h2>এই বইয়ের Stories</h2></div></div>
         <div class="story-grid">${stories.map(storyCard).join("")}</div>
       </section>` : ""}
 
@@ -52,7 +52,7 @@ if (!book) {
       document.body.appendChild(a);
       a.click();
       a.remove();
-      toast("বইটা নামছে… 📥");
+      toast("Download হচ্ছে… 📥");
     }
   });
 }

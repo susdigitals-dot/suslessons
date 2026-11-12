@@ -1,10 +1,10 @@
 // চা খাওয়ান — শুধু ভারতের পাঠকদের জন্য (Razorpay পপআপ, order আসে supabase/functions/cha-order থেকে)। বাংলাদেশ বা অন্য দেশ থেকে এলে পাতাটা চা দেখায় না।
 // চায়ের দোকানের মেনু: প্রতিটা জিনিসের দাম বাঁধা, শুধু সংখ্যা বাড়ানো-কমানো যায়, একসাথে কয়েকটা নেওয়া যায়
-import { CONFIG } from "./config.js?v=202611051913";
-import { getSettings, sendMessage } from "./data.js?v=202611051913";
-import "./track.js?v=202611051913";
-import { $, bn, esc, inline, chrome, toast } from "./ui.js?v=202611051913";
-import { isIndia } from "./geo.js?v=202611051913";
+import { CONFIG } from "./config.js?v=202611121349";
+import { getSettings, sendMessage } from "./data.js?v=202611121349";
+import "./track.js?v=202611121349";
+import { $, bn, esc, inline, chrome, toast } from "./ui.js?v=202611121349";
+import { isIndia } from "./geo.js?v=202611121349";
 
 const settings = await getSettings();
 chrome(settings);
@@ -22,11 +22,11 @@ if (!isIndia()) {
   main.innerHTML = `
     <section class="cha-off">
       <span class="eyebrow">sus.lessons</span>
-      <h1>বইটা আপনার, একদম ফ্রি</h1>
+      <h1>বইটা আপনার, একদম Free</h1>
       <p>এই পাতাটা আপনার দেশ থেকে খোলা যায় না। তাতে কিছু যায় আসে না — বই আর গল্প সবার জন্য।</p>
       <div class="cha-off-actions">
-        <a class="btn btn-maroon" href="/shop#kothin-kotha">দোকানে ফিরুন</a>
-        <button class="btn btn-ghost" type="button" data-follow>ফলো করুন</button>
+        <a class="btn btn-maroon" href="/free">Free e-Books-এ ফিরুন</a>
+        <button class="btn btn-ghost" type="button" data-follow>Follow করুন</button>
       </div>
     </section>`;
 } else {
@@ -41,7 +41,7 @@ function render() {
       <div class="cha-head">
         <span class="eyebrow">চায়ের দোকান</span>
         <h1>${esc(sp.title || "ভাইকে এক কাপ চা খাওয়ান")}</h1>
-        <p class="cha-lead">${inline("বই আর গল্প ==সবার জন্য ফ্রি।== ভালো লাগলে দোকান থেকে কিছু একটা খাওয়ান — পরের গল্পটা হয়তো একটু তাড়াতাড়ি আসবে।")}</p>
+        <p class="cha-lead">${inline("বই আর stories ==সবার জন্য Free।== ভালো লাগলে দোকান থেকে কিছু একটা খাওয়ান — পরের গল্পটা হয়তো একটু তাড়াতাড়ি আসবে।")}</p>
       </div>
       <div class="cha-menu">
         ${MENU.map((m) => `

@@ -1,8 +1,8 @@
 // sus.lessons admin — গল্প, স্লাইড গল্প, বই আর সেটিংস লেখার জায়গা
-import { CONFIG } from "../assets/js/config.js?v=202611051913";
-import { SEED } from "../assets/js/seed.js?v=202611051913";
-import { live, sb } from "../assets/js/data.js?v=202611051913";
-import { $, $$, esc, avatar, wordmark, toast, KINDS, price } from "../assets/js/ui.js?v=202611051913";
+import { CONFIG } from "../assets/js/config.js?v=202611121349";
+import { SEED } from "../assets/js/seed.js?v=202611121349";
+import { live, sb } from "../assets/js/data.js?v=202611121349";
+import { $, $$, esc, avatar, wordmark, toast, KINDS, price } from "../assets/js/ui.js?v=202611121349";
 
 const app = $("#app");
 let user = null;
@@ -489,14 +489,14 @@ async function productsList() {
       PDF আপলোড করো, তারপর সেই লিংকটা এখানে বসাও। ক্রেতা টাকা দিলেই ইমেইলে ফাইল পেয়ে যাবে।
     </div>
     <div class="panel">
-      <h2>ফিচার বই · দোকানের ওপরে</h2>
+      <h2>ফিচার বই · Free e-Books পাতায়</h2>
       <div class="row row-feature">
         <div class="ph"></div>
         <div>
           <h3>কঠিন কথা বলার ৫০টা প্রশ্ন</h3>
-          <div class="sub"><span class="status on">প্রকাশিত</span><span>ই-বুক · ফ্রি (চাকা)</span><span>/${esc(FEATURE_PDF)}</span></div>
+          <div class="sub"><span class="status on">প্রকাশিত</span><span>e-Book · Free PDF</span><span>/${esc(FEATURE_PDF)}</span></div>
         </div>
-        <div class="acts"><a class="btn btn-ghost btn-sm" href="../shop#kothin-kotha" target="_blank">দেখুন</a></div>
+        <div class="acts"><a class="btn btn-ghost btn-sm" href="../free#kothin-kotha" target="_blank">দেখুন</a></div>
       </div>
       ${dl}
       <small class="hint">এই বইটা সাইটের কোডে বসানো, তাই এখান থেকে এডিট হয় না। শুধু আসল সাইটের (${esc(new URL(CONFIG.siteUrl).hostname)}) ডাউনলোড গোনা হয়, admin-এর নিজেরটা নয়।</small>

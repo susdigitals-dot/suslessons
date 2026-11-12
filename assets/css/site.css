@@ -690,3 +690,7 @@ button.nav-follow { font-size: 0.95rem; }
   .cha-info { padding: 12px 14px; }
   .cha-info h2 { font-size: 1.12rem; }
 }
+
+/* Free e-Book download পপআপের cover */
+.kk-get-cover { display: block; width: 120px; height: auto; margin: 16px auto 0; border-radius: 12px; box-shadow: 0 16px 28px -14px rgba(42, 20, 24, 0.6); }
+.kk-dlg .kk-win { margin-top: 14px; }

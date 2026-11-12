@@ -1,10 +1,8 @@
-// দোকানের ফিচার বই — "কঠিন কথা বলার ৫০টা প্রশ্ন"
-// বইয়ের মলাট, উল্টানো যায় এমন প্রশ্ন-কার্ড, আর দাম ঠিক করার চাকা (চাকা সবসময় "ফ্রি"-তে থামে)
-import { $, bn, esc, inline, wordmark } from "./ui.js?v=202611051913";
-import { isIndia } from "./geo.js?v=202611051913";
+// Free e-Books / PDFs — দাম ঠিক করার চাকা (চাকা সবসময় "Free"-তে থামে), ভাসমান বোতাম, বই বাছার তালিকা
+import { $, bn, esc, wordmark } from "./ui.js?v=202611121349";
+import { isIndia } from "./geo.js?v=202611121349";
 
-// চাকা যে বইয়ের জন্য ঘোরে — দোকানের অন্য বইও openWheel-এ নিজের {title, pdf, spun} দেয়
-// দোকানে এখন আর ফিচার করা হয় না — বাকি বইগুলোর মতোই একটা সাধারণ কার্ড
+// চাকা যে বইয়ের জন্য ঘোরে — free.js-এর প্রতিটা বই openWheel-এ নিজের {title, pdf, spun} দেয়
 export const BOOK = {
   kind: "ebook",
   slug: "kothin-kotha",
@@ -18,20 +16,12 @@ export const BOOK = {
 // Facebook / Instagram-এর ভেতরের ব্রাউজারে PDF নামানো যায় না (?inapp দিয়ে পরীক্ষা করা যায়)
 export const INAPP = /FBAN|FBAV|FB_IAB|FBIOS|Instagram|Messenger|Threads|; wv\)/i.test(navigator.userAgent) || /[?&]inapp\b/.test(location.search);
 
-// গাইডের প্রতিটা অধ্যায়ের প্রথম পরিস্থিতি — ওরা কী বলে, আমরা কী বলি না, কী জিজ্ঞেস করি
-const CARDS = [
-  { ch: "বিয়ের কথাবার্তা", n: 15, who: "ছেলের মা", they: "আমরা কিছু চাই না। তবে মেয়েকে নিশ্চয়ই খালি হাতে পাঠাবেন না।", dont: "বুঝেছি, আপনারা দাম চাইছেন।", ask: "খালি হাতে না পাঠানো বলতে আপনারা ঠিক কী বোঝাচ্ছেন?" },
-  { ch: "আত্মীয়দের চাপ", n: 13, who: "মাসি", they: "বিয়েটা কবে করছিস? বয়স তো আর বসে থাকবে না।", dont: "তোমার বিয়েটা কি খুব সুখের হয়েছে?", ask: "তোমার সময়ে বিয়ের সিদ্ধান্তটা কীভাবে নিয়েছিলে, মাসি?" },
-  { ch: "অফিসে ছুটি-বেতন", n: 12, who: "ম্যানেজার", they: "এখন তো রিলিজ চলছে। এখন ছুটি?", dont: "ছুটি না দিলে রিজাইন করবো।", ask: "আমার কাজগুলো কীভাবে সামলে দিয়ে গেলে ছুটিটা সম্ভব হবে?" },
-  { ch: "ধারের টাকা", n: 10, who: "শুভ", they: "দেবো রে দেবো। পালিয়ে যাচ্ছি নাকি?", dont: "তুই কোনোদিনই ফেরত দিবি না, জানি।", ask: "কোন মাস থেকে শুরু করলে তোর সুবিধা হয়?" },
-];
-
 // চাকার ঘর — ঘড়ির কাঁটার দিকে, ওপর থেকে। ফ্রি দু'জায়গায়, পাশাপাশি নয়
 const SLICES = [
-  { label: "ফ্রি", free: true, fill: "#3e2228", ink: "#d6a35c" },
+  { label: "Free", free: true, fill: "#3e2228", ink: "#d6a35c" },
   { label: "₹৯", fill: "#fbf7ef", ink: "#3e2228" },
   { label: "₹১৫", fill: "#d6a35c", ink: "#3e2228" },
-  { label: "ফ্রি", free: true, fill: "#3e2228", ink: "#d6a35c" },
+  { label: "Free", free: true, fill: "#3e2228", ink: "#d6a35c" },
   { label: "₹২১", fill: "#d05a23", ink: "#fbf7ef" },
 ];
 const STEP = 360 / SLICES.length;
@@ -45,84 +35,21 @@ const store = (k, v) => {
   }
 };
 
-export function featureHtml() {
-  return `
-    <section class="kk" id="kothin-kotha" aria-labelledby="kk-title">
-      <div class="kk-top">
-        <div class="kk-art">
-        <div class="kk-book" aria-hidden="true">
-          <div class="kk-cover">
-            <span class="kk-c-mark">— sus.lessons —</span>
-            <span class="kk-c-num">${bn(50)}</span>
-            <span class="kk-c-title">কঠিন কথা বলার<br>৫০টা প্রশ্ন</span>
-            <span class="kk-c-rule"></span>
-            <span class="kk-c-sub">চুপ আর চিৎকারের<br>মাঝের রাস্তা</span>
-            <span class="kk-q kk-q1">?</span><span class="kk-q kk-q2">?</span>
-          </div>
-          <div class="kk-pages"></div>
-        </div>
-        <div class="kk-btns">
-          <button class="btn btn-maroon kk-dl" type="button" data-wheel>⬇ DOWNLOAD NOW</button>
-          <button class="btn btn-ghost" type="button" data-wheel>📖 ই-বুক নামান</button>
-        </div>
-        </div>
-        <div class="kk-copy">
-          <span class="eyebrow">নতুন গাইড · PDF</span>
-          <h2 id="kk-title">কঠিন কথা বলার ৫০টা প্রশ্ন</h2>
-          <p class="kk-hook">${inline("রাগের মাথায় যে লাইনটা বেরিয়ে আসে, সেটা ==সম্পর্ক ভাঙে।== একটা শান্ত প্রশ্ন সেই কথাটাই বলে — আর উল্টো দিকের মানুষটাকে ভাবতে বাধ্য করে।")}</p>
-          <ul class="kk-stats">
-            <li><b>${bn(50)}</b><span>প্রশ্ন</span></li>
-            <li><b>${bn(4)}</b><span>পরিস্থিতি</span></li>
-            <li><b>${bn(138)}</b><span>পাতা</span></li>
-            <li><b>📱</b><span>মোবাইলে পড়ার মতো</span></li>
-          </ul>
-        </div>
-      </div>
-      <div class="kk-deck">
-        <p class="kk-deck-h"><b>রাগের লাইন → প্রশ্ন।</b> কার্ডে চাপ দিন, দেখুন চিৎকারের বদলে কী জিজ্ঞেস করবেন।</p>
-        <div class="kk-cards">
-          ${CARDS.map((c, i) => `
-            <button class="kk-card" type="button" aria-pressed="false" style="--i:${i}">
-              <span class="kk-face kk-front">
-                <span class="kk-ch">${esc(c.ch)} · ${bn(c.n)}টা প্রশ্ন</span>
-                <span class="kk-who">${esc(c.who)} বললেন—</span>
-                <span class="kk-they">“${esc(c.they)}”</span>
-                <span class="kk-flip">উল্টে দেখুন ↻</span>
-              </span>
-              <span class="kk-face kk-back">
-                <span class="kk-lbl">যেটা বলবেন না</span>
-                <s class="kk-dont">${esc(c.dont)}</s>
-                <span class="kk-lbl kk-lbl-ask">যেটা জিজ্ঞেস করবেন</span>
-                <span class="kk-ask">${esc(c.ask)}</span>
-              </span>
-            </button>`).join("")}
-        </div>
-      </div>
-    </section>`;
-}
-
-// more: দোকানের বাকি বই — ভাসমান বোতাম চাপলে আগে জিজ্ঞেস করে কোনটা নেবেন
-export function initFeature(more = []) {
-  // ফিচার অংশটা পাতায় না থাকলেও ভাসমান বোতাম আর #spin কাজ করে
-  $("#kothin-kotha")?.addEventListener("click", (e) => {
-    if (e.target.closest("[data-wheel]")) openWheel(BOOK);
-    const card = e.target.closest(".kk-card");
-    if (card) {
-      const on = card.classList.toggle("on");
-      card.setAttribute("aria-pressed", on);
-    }
-  });
-
+// list: পাতার সব বই — ভাসমান বোতাম চাপলে আগে জিজ্ঞেস করে কোনটা নেবেন
+export function initFeature(list = [BOOK]) {
   // সবসময় ভেসে থাকা বোতাম — দাম বা চাকার কথা নয়, শুধু বোঝা যাক একটা ই-বুক অপেক্ষা করছে
   const fab = document.createElement("button");
   fab.type = "button";
   fab.className = "kk-fab";
-  fab.innerHTML = `<span class="kk-fab-ico" aria-hidden="true">📖</span><span class="kk-fab-txt">আপনার <b>ই-বুক</b> নিন →</span>`;
-  fab.addEventListener("click", () => (more.length ? pickBook([BOOK, ...more]) : openWheel(BOOK)));
+  fab.innerHTML = `<span class="kk-fab-ico" aria-hidden="true">📖</span><span class="kk-fab-txt"><b>Free e-Book</b> নিন →</span>`;
+  fab.addEventListener("click", () => (list.length > 1 ? pickBook(list) : openWheel(list[0])));
   document.body.appendChild(fab);
 
-  // ইনস্টাগ্রাম থেকে সোজা চাকায়: /shop#spin
+  // Instagram থেকে সোজা চাকায়: /free#spin (পুরোনো /shop#spin-ও এখানে আসে)
   if (location.hash === "#spin") openWheel(BOOK);
+  // /free#slug — সোজা সেই বইয়ের চাকা
+  const b = list.find((x) => "#" + x.slug === location.hash);
+  if (b) openWheel(b);
 }
 
 // ── চাকা ───────────────────────────
@@ -146,7 +73,7 @@ function wheelSvg() {
     return `<circle cx="${x}" cy="${y}" r="1.6" fill="#d6a35c"/>`;
   }).join("");
   return `
-    <svg viewBox="-4 -4 208 208" class="kk-wheel-svg" role="img" aria-label="দামের চাকা: ফ্রি, ৯ টাকা, ১৫ টাকা, ফ্রি, ২১ টাকা">
+    <svg viewBox="-4 -4 208 208" class="kk-wheel-svg" role="img" aria-label="দামের চাকা: Free, ৯ টাকা, ১৫ টাকা, Free, ২১ টাকা">
       <circle cx="100" cy="100" r="102" fill="#3e2228"/>
       <g class="kk-rotor">${slices}${dots}</g>
       <circle cx="100" cy="100" r="17" fill="#ece4d6" stroke="#3e2228" stroke-width="3"/>
@@ -179,14 +106,14 @@ let picks = [];
 function pickBook(list) {
   picks = list;
   dialog().innerHTML = `
-    <button class="close" data-close aria-label="বন্ধ করুন">✕</button>
+    <button class="close" data-close aria-label="Close">✕</button>
     ${wordmark()}
-    <h2 id="kk-dlg-h">কোন বইটা নেবেন?</h2>
+    <h2 id="kk-dlg-h">কোন e-Book-টা নেবেন?</h2>
     <div class="kk-picks">
       ${list.map((b, i) => `
         <button class="kk-pick" type="button" data-pick="${i}">
           ${b.cover_url ? `<img src="${esc(b.cover_url)}" alt="" width="56" height="70">` : `<span class="kk-pick-c">${bn(50)}</span>`}
-          <span><b>${esc(b.title)}</b><small>${esc(b.tag || "PDF ই-বুক")}</small></span>
+          <span><b>${esc(b.title)}</b><small>${esc(b.tag || "PDF e-Book")}</small></span>
           <span aria-hidden="true">→</span>
         </button>`).join("")}
     </div>`;
@@ -196,16 +123,16 @@ function pickBook(list) {
 export function openWheel(b) {
   book = b;
   dialog().innerHTML = `
-    <button class="close" data-close aria-label="বন্ধ করুন">✕</button>
+    <button class="close" data-close aria-label="Close">✕</button>
     ${wordmark()}
     <h2 id="kk-dlg-h">দাম ঠিক করবে চাকা</h2>
-    <p>${esc(book.title)} — একবার ঘোরান, যেখানে থামবে সেই দামে বই।</p>
+    <p>${esc(book.title)} — একবার Spin করুন, যেখানে থামবে সেই দামে বই।</p>
     <div class="kk-wheel">
       <span class="kk-pin" aria-hidden="true"></span>
       ${wheelSvg()}
     </div>
     <div class="kk-out" aria-live="polite">
-      <button class="btn btn-maroon kk-go" type="button" data-go>চাকা ঘোরান 🎡</button>
+      <button class="btn btn-maroon kk-go" type="button" data-go>Spin করুন 🎡</button>
     </div>`;
   if (!dlg.open) dlg.showModal();
   turned = 0;
@@ -235,7 +162,7 @@ function rotate(at, animate = true) {
 function spin() {
   const go = dlg.querySelector(".kk-go");
   go.disabled = true;
-  go.textContent = "ঘুরছে…";
+  go.textContent = "Spinning…";
   dlg.querySelector(".kk-wheel").classList.add("spinning");
   const from = turned;
   rotate(landing());
@@ -252,13 +179,13 @@ function result(again) {
   const out = dlg.querySelector(".kk-out");
   out.innerHTML = `
     <div class="kk-win${again ? "" : " pop"}">
-      <span class="kk-stamp">ফ্রি!</span>
-      <p><b>${again ? "আপনার চাকা ফ্রি-তেই থেমেছিলো।" : "চাকা থামলো ফ্রি-তে!"}</b><br>বইটা আপনার — একটা টাকাও লাগবে না।</p>
-      ${INAPP ? inappHtml() : `<a class="btn btn-gold" href="${book.pdf}" download>⬇ বইটা নামিয়ে নিন (PDF)</a>`}
+      <span class="kk-stamp">FREE!</span>
+      <p><b>${again ? "আপনার চাকা Free-তেই থেমেছিলো।" : "চাকা থামলো Free-তে!"}</b><br>বইটা আপনার — একটা টাকাও লাগবে না।</p>
+      ${INAPP ? inappHtml() : `<a class="btn btn-gold" href="${book.pdf}" download>⬇ Download PDF</a>`}
       ${isIndia() ? `<a class="kk-cha" href="cha.html"><span>☕</span><span><b>বইটা কাজে লাগলে, ভাইকে এক কাপ চা?</b><small>পুরোপুরি আপনার ইচ্ছে</small></span><span>→</span></a>` : ""}
     </div>
     ${again ? "" : confetti()}`;
-  // চাকা ছোট হয়ে সরে যায়, যাতে ফ্রি থেকে চা অবধি পুরোটা একসাথে দেখা যায়
+  // চাকা ছোট হয়ে সরে যায়, যাতে Free থেকে চা অবধি পুরোটা একসাথে দেখা যায়
   const wheel = dlg.querySelector(".kk-wheel");
   wheel.classList.add("done");
   const last = out.querySelector(".kk-cha") || out.querySelector(".kk-win");
@@ -269,15 +196,15 @@ function result(again) {
 // FB/Insta-র ভেতরে PDF নামে না — লিংকটা WhatsApp-এ নিজেকে পাঠিয়ে সেখান থেকে নামানো
 function inappHtml() {
   const url = new URL(book.pdf, location.href).href;
-  const wa = `https://wa.me/?text=${encodeURIComponent(`📖 আমার ই-বুক: ${book.title}\n` + url)}`;
+  const wa = `https://wa.me/?text=${encodeURIComponent(`📖 আমার Free e-Book: ${book.title}\n` + url)}`;
   // আগে একটা ছোট পপআপ বুঝিয়ে দেয় কেন WhatsApp — "বুঝলাম" চাপলেই WhatsApp খোলে
   return `
     <button class="btn btn-gold kk-wa" type="button" data-wa><img src="assets/img/whatsapp.png" alt="" width="26" height="26">PDF DOWNLOAD</button>
     <div class="kk-wapop" role="alertdialog" aria-labelledby="kk-wapop-h" hidden>
       <div class="kk-wapop-card">
         <img src="assets/img/whatsapp.png" alt="" width="56" height="56">
-        <p id="kk-wapop-h"><b>Instagram বা Facebook থেকে সরাসরি PDF ডাউনলোড হয় না।</b><br>তাই WhatsApp-এ নিজেকে পাঠিয়ে নিন, তারপর সেখান থেকে ডাউনলোড করে নিন।</p>
-        <a class="btn btn-maroon" href="${wa}" target="_blank" rel="noopener" data-ok>বুঝলাম</a>
+        <p id="kk-wapop-h"><b>Instagram বা Facebook থেকে সরাসরি PDF download হয় না।</b><br>তাই WhatsApp-এ নিজেকে পাঠিয়ে নিন, তারপর সেখান থেকে download করে নিন।</p>
+        <a class="btn btn-maroon" href="${wa}" target="_blank" rel="noopener" data-ok>OK, বুঝেছি</a>
       </div>
     </div>`;
 }

@@ -1,4 +1,4 @@
-"""লোকাল প্রিভিউ সার্ভার — GitHub Pages-এর মতো /shop খুললে shop.html দেখায়।
+"""লোকাল প্রিভিউ সার্ভার — GitHub Pages-এর মতো /free খুললে free.html দেখায়।
 
     python tools/serve.py          # http://localhost:5500
     python tools/serve.py 8000

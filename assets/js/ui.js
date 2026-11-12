@@ -67,16 +67,16 @@ export function root() {
 
 // ── হেডার / ফুটার ───────────────────────────
 const NAV = [
-  ["index.html", "হোম"],
-  ["stories.html", "গল্প"],
-  ["books.html", "বই"],
-  ["/shop", "দোকান"],
+  ["index.html", "Home"],
+  ["stories.html", "Stories"],
+  ["books.html", "Books"],
+  ["/free", "Free e-Books"],
 ];
 
 // ফুটারের আইনি পাতা — পেমেন্ট গেটওয়ে (Razorpay ইত্যাদি) এগুলো চায়
 const LEGAL = [
-  ["about.html", "আমাদের কথা"],
-  ["contact.html", "যোগাযোগ"],
+  ["about.html", "About us"],
+  ["contact.html", "Contact"],
   ["privacy.html", "Privacy Policy"],
   ["terms.html", "Terms & Conditions"],
   ["refund.html", "Refund Policy"],
@@ -88,18 +88,18 @@ export function chrome(settings) {
   document.addEventListener("click", (e) => {
     if (e.target.closest("[data-follow]")) followDialog(settings);
   });
-  // "/shop", "shop.html" আর "/shop.html" — সবই একই পাতা
+  // "/free", "free.html" আর "/free.html" — সবই একই পাতা
   const page = (h) => h.split("/").pop().replace(/\.html$/, "") || "index";
   const here = page(location.pathname);
   const header = $("#site-header");
   if (header) {
     header.innerHTML = `
       <div class="wrap bar">
-        <a class="brand" href="index.html" aria-label="sus.lessons হোম">${avatar(40)}${wordmark()}</a>
-        <button class="menu-btn" aria-label="মেনু" aria-expanded="false"><span></span><span></span></button>
+        <a class="brand" href="index.html" aria-label="sus.lessons Home">${avatar(40)}${wordmark()}</a>
+        <button class="menu-btn" aria-label="Menu" aria-expanded="false"><span></span><span></span></button>
         <nav class="nav">
           ${NAV.map(([href, label]) => `<a href="${href}"${page(href) === here ? ' aria-current="page"' : ""}>${label}</a>`).join("")}
-          <button class="pill pill-maroon nav-follow" type="button" data-follow>ফলো করুন</button>
+          <button class="pill pill-maroon nav-follow" type="button" data-follow>Follow করুন</button>
         </nav>
       </div>`;
     const btn = $(".menu-btn", header);
@@ -123,12 +123,12 @@ export function chrome(settings) {
           ${settings.facebook ? `<a href="${safeUrl(settings.facebook)}" target="_blank" rel="noopener">Facebook</a>` : ""}
         </nav>
       </div>
-      <nav class="wrap foot-legal" aria-label="নীতি ও যোগাযোগ">
+      <nav class="wrap foot-legal" aria-label="Policy ও Contact">
         ${LEGAL.map(([h, l]) => `<a href="${root()}${h}">${l}</a>`).join("")}
       </nav>
       <div class="wrap foot-small">
         <small>© ${bn(new Date().getFullYear())} ${esc(settings.business?.name || "sus.lessons")} · #sus_lessons</small>
-        <small>কিছু লিংক affiliate — সেখান থেকে কিনলে আপনার খরচ বাড়ে না, আমরা সামান্য কমিশন পাই।</small>
+        <small>কিছু link affiliate — সেখান থেকে কিনলে আপনার খরচ বাড়ে না, আমরা সামান্য commission পাই।</small>
       </div>`;
   }
 }
@@ -184,23 +184,23 @@ export function bookCard(b, { direct = false } = {}) {
         ${out
           ? `<div class="bc-buy">${buy.map((a) => `<a class="btn btn-gold" href="${safeUrl(a.url)}" target="_blank" rel="sponsored noopener">${esc(a.store)}-এ কিনুন ↗</a>`).join("")}</div>`
           : `<div class="bc-actions">
-          ${b.pdf_url ? `<span class="chip chip-free">বিনামূল্যে PDF</span>` : ""}
-          ${buy.length ? `<span class="chip">কিনুন</span>` : ""}
+          ${b.pdf_url ? `<span class="chip chip-free">Free PDF</span>` : ""}
+          ${buy.length ? `<span class="chip">Buy</span>` : ""}
         </div>`}
       </div>
     </article>`;
 }
 
-// ── দোকান ───────────────────────────
+// ── e-Book / product কার্ড ───────────────────────────
 export const KINDS = {
-  ebook: "ই-বুক",
-  notes: "নোটস",
-  guide: "গাইড",
-  checklist: "চেকলিস্ট",
-  affiliate: "প্রস্তাবিত",
+  ebook: "e-Book",
+  notes: "Notes",
+  guide: "Guide",
+  checklist: "Checklist",
+  affiliate: "Recommended",
 };
 
-export const price = (n) => (Number(n) > 0 ? `₹${bn(Number(n).toLocaleString("en-IN"))}` : "ফ্রি");
+export const price = (n) => (Number(n) > 0 ? `₹${bn(Number(n).toLocaleString("en-IN"))}` : "Free");
 
 export function priceTag(p) {
   if (p.kind === "affiliate" && !p.price) return "";
@@ -246,12 +246,12 @@ const digits = (s = "") => String(s).replace(/[^\d+]/g, "");
 export function contactWays(biz, settings) {
   const wa = digits(biz.whatsapp).replace(/^\+/, "");
   return [
-    biz.email && ["ইমেইল", `<a href="mailto:${esc(biz.email)}">${esc(biz.email)}</a>`],
-    biz.phone && ["ফোন", `<a href="tel:${esc(digits(biz.phone))}">${esc(biz.phone)}</a>`],
+    biz.email && ["Email", `<a href="mailto:${esc(biz.email)}">${esc(biz.email)}</a>`],
+    biz.phone && ["Phone", `<a href="tel:${esc(digits(biz.phone))}">${esc(biz.phone)}</a>`],
     wa && ["WhatsApp", `<a href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">${esc(biz.whatsapp)}</a>`],
     settings?.instagram && ["Instagram", `<a href="${safeUrl(settings.instagram)}" target="_blank" rel="noopener">@sus.lessons</a>`],
-    biz.address && ["ঠিকানা", esc(biz.address).replace(/\n/g, "<br>")],
-    biz.hours && ["সময়", esc(biz.hours)],
+    biz.address && ["Address", esc(biz.address).replace(/\n/g, "<br>")],
+    biz.hours && ["Time", esc(biz.hours)],
   ].filter(Boolean);
 }
 
@@ -276,7 +276,7 @@ export function fillBiz(settings) {
 }
 
 // এন্ড কার্ড — মেরুন, শেষ লাইন + ফলো পিল
-export function endCard(line, settings, sub = "এমন আরও গল্পের জন্য") {
+export function endCard(line, settings, sub = "এমন আরও stories-এর জন্য") {
   return `
     <section class="end-card">
       <div class="end-frame">
@@ -284,7 +284,7 @@ export function endCard(line, settings, sub = "এমন আরও গল্প�
         <p class="end-line">${inline(line)}</p>
         <span class="end-rule"></span>
         <p class="end-sub">${esc(sub)}</p>
-        <button class="follow-pill" type="button" data-follow>${avatar(34)}<span>ফলো করুন <b>sus.lessons</b></span></button>
+        <button class="follow-pill" type="button" data-follow>${avatar(34)}<span>Follow করুন <b>sus.lessons</b></span></button>
       </div>
     </section>`;
 }
@@ -308,18 +308,18 @@ export function followDialog(settings) {
     });
   }
   const ways = [
-    ["youtube", "YouTube", "ভিডিও গল্প দেখুন", settings.youtube],
-    ["facebook", "Facebook", "পেজে ফলো করুন", settings.facebook],
-    ["instagram", "Instagram", "রিল আর গল্প", settings.instagram],
+    ["youtube", "YouTube", "Video stories দেখুন", settings.youtube],
+    ["facebook", "Facebook", "Page-এ Follow করুন", settings.facebook],
+    ["instagram", "Instagram", "Reels আর stories", settings.instagram],
   ].filter((w) => w[3]);
   dlg.innerHTML = `
-    <button class="close" data-close aria-label="বন্ধ করুন">✕</button>
+    <button class="close" data-close aria-label="Close">✕</button>
     ${wordmark()}
-    <h2>ফলো করুন</h2>
-    ${settings.followers ? `<p>${esc(settings.followers)} ফলোয়ার — আপনিও যোগ দিন</p>` : ""}
+    <h2>Follow করুন</h2>
+    ${settings.followers ? `<p>${esc(settings.followers)} followers — আপনিও join করুন</p>` : ""}
     <div class="follow-list">
       ${ways.map(([k, name, sub, url]) => `
-        <a class="follow-row follow-${k}" href="${safeUrl(url)}" target="_blank" rel="noopener" aria-label="${name}-এ ফলো করুন" data-close>
+        <a class="follow-row follow-${k}" href="${safeUrl(url)}" target="_blank" rel="noopener" aria-label="${name}-এ Follow করুন" data-close>
           <span class="follow-icon">${ICONS[k]}</span>
           <span class="follow-text"><b>${name}</b><small>${sub}</small></span>
           <span class="follow-go">↗</span>
@@ -345,21 +345,21 @@ export function supportDialog(settings, { title, download } = {}) {
   }
   const upiLink = sp.upi ? `upi://pay?pa=${encodeURIComponent(sp.upi)}&pn=${encodeURIComponent(sp.upiName || "sus.lessons")}&cu=INR` : "";
   const rows = [
-    sp.upi && `<div class="pay-row"><span>UPI</span><code>${esc(sp.upi)}</code><button class="btn-mini" data-copy="${esc(sp.upi)}">কপি</button></div>`,
-    sp.bkash && `<div class="pay-row"><span>বিকাশ</span><code>${esc(sp.bkash)}</code><button class="btn-mini" data-copy="${esc(sp.bkash)}">কপি</button></div>`,
+    sp.upi && `<div class="pay-row"><span>UPI</span><code>${esc(sp.upi)}</code><button class="btn-mini" data-copy="${esc(sp.upi)}">Copy</button></div>`,
+    sp.bkash && `<div class="pay-row"><span>বিকাশ</span><code>${esc(sp.bkash)}</code><button class="btn-mini" data-copy="${esc(sp.bkash)}">Copy</button></div>`,
   ].filter(Boolean);
   dlg.innerHTML = `
-    <button class="close" data-close aria-label="বন্ধ করুন">✕</button>
+    <button class="close" data-close aria-label="Close">✕</button>
     ${wordmark()}
     <h2>${esc(sp.title)}</h2>
     <p>${esc(sp.text)}</p>
     ${rows.length ? `<div class="pay-list">${rows.join("")}</div>` : ""}
     <div class="support-actions">
-      ${upiLink ? `<a class="btn btn-maroon" href="${upiLink}">UPI অ্যাপে খুলুন</a>` : ""}
+      ${upiLink ? `<a class="btn btn-maroon" href="${upiLink}">UPI App-এ খুলুন</a>` : ""}
       ${sp.link ? `<a class="btn btn-maroon" href="${safeUrl(sp.link)}" target="_blank" rel="noopener">চা খাওয়ান ↗</a>` : ""}
-      ${download ? `<a class="btn btn-gold" href="${safeUrl(download)}" download data-close>⬇ ${title ? esc(title) + " — " : ""}বইটা নামিয়ে নিন</a>` : ""}
+      ${download ? `<a class="btn btn-gold" href="${safeUrl(download)}" download data-close>⬇ ${title ? esc(title) + " — " : ""}Download</a>` : ""}
     </div>
-    <p class="note">বই সবার জন্য। চা খাওয়ানো সম্পূর্ণ আপনার ইচ্ছে। ❤️</p>`;
+    <p class="note">বই সবার জন্য Free। চা খাওয়ানো সম্পূর্ণ আপনার ইচ্ছে। ❤️</p>`;
   dlg.showModal();
 }
 
@@ -373,7 +373,7 @@ async function copy(text) {
     document.execCommand("copy");
     ta.remove();
   }
-  toast("কপি হয়েছে ✓");
+  toast("Copied ✓");
 }
 
 let toastTimer;

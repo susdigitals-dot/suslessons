@@ -1,4 +1,4 @@
-"""sitemap.xml বানায় — Supabase থেকে প্রকাশিত গল্প, বই আর পণ্য নিয়ে।
+"""sitemap.xml বানায় — Supabase থেকে প্রকাশিত গল্প আর বই নিয়ে।
 
     python tools/sitemap.py
 
@@ -21,7 +21,7 @@ STATIC = [
     ("", "daily", "1.0"),
     ("stories.html", "daily", "0.9"),
     ("books.html", "weekly", "0.8"),
-    ("shop", "weekly", "0.6"),
+    ("free", "weekly", "0.7"),
     ("about.html", "monthly", "0.5"),
     ("contact.html", "yearly", "0.3"),
     ("privacy.html", "yearly", "0.2"),
@@ -51,8 +51,6 @@ for s in rows("stories", f"select=slug,published_at,updated_at&published=eq.true
     urls.append((f"{SITE}/story.html?s={s['slug']}", day(s.get("updated_at") or s.get("published_at")), "monthly", "0.8"))
 for b in rows("books", "select=slug,updated_at&published=eq.true"):
     urls.append((f"{SITE}/book.html?b={b['slug']}", day(b.get("updated_at")), "monthly", "0.7"))
-for p in rows("products", "select=slug,updated_at&published=eq.true"):
-    urls.append((f"{SITE}/product.html?p={p['slug']}", day(p.get("updated_at")), "monthly", "0.5"))
 
 body = "\n".join(
     f"  <url><loc>{escape(u)}</loc><lastmod>{m}</lastmod><changefreq>{f}</changefreq><priority>{pr}</priority></url>"

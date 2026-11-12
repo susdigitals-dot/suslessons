@@ -1,6 +1,6 @@
-import { getSettings, getStory, getBook, listStories } from "./data.js?v=202611051913";
-import "./track.js?v=202611051913";
-import { $, esc, inline, safeUrl, chrome, renderBody, fmtDate, lawTag, avatar, endCard, bookMock, storyCard, setMeta } from "./ui.js?v=202611051913";
+import { getSettings, getStory, getBook, listStories } from "./data.js?v=202611121349";
+import "./track.js?v=202611121349";
+import { $, esc, inline, safeUrl, chrome, renderBody, fmtDate, lawTag, avatar, endCard, bookMock, storyCard, setMeta } from "./ui.js?v=202611121349";
 
 const slug = new URLSearchParams(location.search).get("s") || "";
 const settings = await getSettings();
@@ -10,7 +10,7 @@ const story = slug ? await getStory(slug) : null;
 const main = $("#story");
 
 if (!story) {
-  main.innerHTML = `<div class="wrap empty"><h2>গল্পটা খুঁজে পেলাম না</h2><p><a class="section-link" href="stories.html">সব গল্প দেখুন →</a></p></div>`;
+  main.innerHTML = `<div class="wrap empty"><h2>Story-টা খুঁজে পেলাম না</h2><p><a class="section-link" href="stories.html">সব Stories দেখুন →</a></p></div>`;
 } else {
   setMeta(story.title.replace(/==|\*\*/g, ""), story.excerpt);
   const book = story.book_slug ? await getBook(story.book_slug) : null;
@@ -46,7 +46,7 @@ if (!story) {
   if (others.length)
     $("#more").innerHTML = `
       <section class="section" style="padding-top:0">
-        <div class="section-head"><div><span class="eyebrow">Read next</span><h2>আরও গল্প</h2></div><a class="section-link" href="stories.html">সব গল্প →</a></div>
+        <div class="section-head"><div><span class="eyebrow">Read next</span><h2>আরও Stories</h2></div><a class="section-link" href="stories.html">সব Stories →</a></div>
         <div class="story-grid">${others.map(storyCard).join("")}</div>
       </section>`;
 }

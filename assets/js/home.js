@@ -1,6 +1,6 @@
-import { getSettings, listStories, listBooks } from "./data.js?v=202611051913";
-import "./track.js?v=202611051913";
-import { $, inline, esc, safeUrl, chrome, storyCard, bookCard, bookMock, endCard, lawTag } from "./ui.js?v=202611051913";
+import { getSettings, listStories, listBooks } from "./data.js?v=202611121349";
+import "./track.js?v=202611121349";
+import { $, inline, esc, safeUrl, chrome, storyCard, bookCard, bookMock, endCard, lawTag } from "./ui.js?v=202611121349";
 
 const settings = await getSettings();
 chrome(settings);
@@ -9,7 +9,7 @@ $("#heroTitle").innerHTML = inline(settings.tagline).replace(/(শেষ লা�
 $("#heroIntro").textContent = settings.intro;
 const [blogs, books] = await Promise.all([listStories({ limit: 6 }), listBooks()]);
 
-$("#latest").innerHTML = blogs.length ? blogs.map(storyCard).join("") : `<p class="empty">শীঘ্রই নতুন গল্প আসছে।</p>`;
+$("#latest").innerHTML = blogs.length ? blogs.map(storyCard).join("") : `<p class="empty">শীঘ্রই নতুন story আসছে।</p>`;
 $("#shelf").innerHTML = books.slice(0, 4).map(bookCard).join("");
 
 // আজকের বই — featured বই, না থাকলে প্রথমটা
@@ -27,7 +27,7 @@ if (b) {
           ${(b.laws || []).length ? `<ul class="laws">${b.laws.slice(0, 3).map((l) => `<li>${lawTag(l.no)}<b>${esc(l.name)}</b><span>${esc(l.line)}</span></li>`).join("")}</ul>` : ""}
           <div class="buy-row">
             ${(b.affiliate || []).map((a) => `<a class="btn btn-gold" href="${safeUrl(a.url)}" target="_blank" rel="sponsored noopener">${esc(a.store)}-এ কিনুন ↗</a>`).join("")}
-            <a class="btn btn-paper" href="${href}">বইটার গল্পগুলো</a>
+            <a class="btn btn-paper" href="${href}">এই বইয়ের Stories</a>
           </div>        </div>
       </div>
     </div>`;
